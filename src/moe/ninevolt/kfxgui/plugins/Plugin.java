@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
  * Author: 9volt
  * Created: 2022/01/22
  */
-public class Plugin {
+public class Plugin implements Comparable<Plugin> {
 
     private final String name;
     private final String author;
@@ -133,6 +133,11 @@ public class Plugin {
     public static String normalizeOutput(String input, boolean wrap) {
         String replace = input.replaceAll("\\?", "\\\\");
         return wrap ? '{' + replace + '}'  : replace;
+    }
+
+    @Override
+    public int compareTo(Plugin o) {
+        return this.name.compareTo(o.getName());
     }
 
 }

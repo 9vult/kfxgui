@@ -47,10 +47,20 @@ public class PluginLoader {
     }
 
     /**
+     * Get the list of loaded plugins
+     * @return Map of loaded plugins
+     */
+    public ArrayList<Plugin> getSortedPlugins() {
+        ArrayList<Plugin> values = new ArrayList<>(plugins.values());
+        Collections.sort(values);
+        return values;
+    }
+
+    /**
      * Get the list of loaded plugin names
      * @return List of plugin names
      */
-    public ArrayList<String> getLoadedPlugins() {
+    public ArrayList<String> getLoadedNames() {
         ArrayList<String> names = new ArrayList<>(plugins.keySet());
         Collections.sort(names);
         return names;
