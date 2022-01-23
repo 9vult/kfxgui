@@ -38,24 +38,33 @@ public class PluginLoader {
                 Plugin p = gson.fromJson(Files.newBufferedReader(pluginPath), Plugin.class);
                 plugins.put(p.getName(), p);
             }
-
+            // Load in the Transform "plugin"
+            plugins.put(Transform.NAME, new Transform());
+            
         } catch (IOException ioe) {
             System.err.println(String.format("PluginLoader: %s", ioe.getMessage()));
         }
     }
 
     /**
-     * Get the map of currently loaded plugins
-     * @return Map of plugins
+     * Get the list of loaded plugin names
+     * @return List of plugin names
      */
-    public Map<String, Plugin> getLoadedPlugins() {
-        return plugins;
-    }
-
-    public ArrayList<String> getLoadedPluginNames() {
+    public ArrayList<String> getLoadedPlugins() {
         ArrayList<String> names = new ArrayList<>(plugins.keySet());
         Collections.sort(names);
         return names;
+    }
+
+    /**
+     * Create a new instance of an action (plugin).
+     * <p>Returns a copy of the "original" plugin instance
+     * with the same base parameters.</p>
+     * @param name Name of the plugin to create
+     * @return New copy of the specified plugin
+     */
+    public Plugin create(String name) {
+        return new Plugin(plugins.get(name));
     }
     
 }

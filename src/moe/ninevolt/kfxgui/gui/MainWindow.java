@@ -13,6 +13,11 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import moe.ninevolt.kfxgui.KfxGui;
 
+/**
+ * MainWindow.java
+ * Author: 9volt
+ * Created: 2022/01/23
+ */
 public class MainWindow extends Application {
 
     // Layout definitions
@@ -53,7 +58,7 @@ public class MainWindow extends Application {
         bp.setTop(menuBar);
 
         toolboxLabel.setStyle("-fx-font-size: 16;");
-        pluginList.getItems().addAll(KfxGui.getPluginLoader().getLoadedPluginNames());
+        pluginList.getItems().addAll(KfxGui.getPluginLoader().getLoadedPlugins());
         toolbox.getChildren().addAll(toolboxLabel, pluginList);
         VBox.setVgrow(pluginList, Priority.ALWAYS);
         bp.setLeft(toolbox);

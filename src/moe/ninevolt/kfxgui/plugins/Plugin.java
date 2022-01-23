@@ -28,6 +28,10 @@ public class Plugin {
      * Plugins are created using a JSON file describing basic details
      * about the action the plugin will perform, like the parameters
      * required and the resulting template code format.
+     * 
+     * <p>This constructor should not be used outside of initial
+     * loading from the JSON files. Use the copy constructor for
+     * making usable plugin instances.</p>
      * @param name Name of the plugin
      * @param author Author of the plugin
      * @param description Brief description of the plugin
@@ -45,13 +49,31 @@ public class Plugin {
     }
 
     /**
+     * Creates a duplicate.
+     * This is used so a "original copy" can be kept, with
+     * all in-use actions being a copy of that original copy,
+     * allowing for multiple of the same type of plugin to
+     * co-exist.
+     * @param p Plugin to copy
+     */
+    public Plugin(Plugin p) {
+        this.name = p.name;
+        this.author = p.author;
+        this.description = p.description;
+        this.transform = p.transform;
+        this.params = p.params;
+        this.format = p.format;
+        this.paramMap = new HashMap<>();
+        Arrays.stream(params).forEach(param -> paramMap.put(param, ""));
+    }
+
+    /**
      * Set a parameter for this plugin.
      * The value must use <code>?</code> in place of <code>\</code?
      * @param param Name of the parameter being set
      * @param value Value of the parameter
      */
     public void setParam(String param, String value) {
-        if (this.paramMap == null) setUpMap();
         paramMap.put(param, value);
     }
 
@@ -74,9 +96,8 @@ public class Plugin {
         return result;
     }
 
-    private void setUpMap() {
-        this.paramMap = new HashMap<>();
-        Arrays.stream(params).forEach(param -> paramMap.put(param, ""));
+    public Map<String, String> getParamMap() {
+        return paramMap;
     }
 
     public String getName() {

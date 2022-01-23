@@ -2,7 +2,7 @@
     "name": "Shadow",
     "author": "9volt",
     "description": "Set the shadow distance",
-    "transform": false,
+    "transform": true,
     "params": [
         "ShadowDistance"
     ],

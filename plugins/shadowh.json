@@ -2,7 +2,7 @@
     "name": "Shadow (Horizontal)",
     "author": "9volt",
     "description": "Set the horizontal shadow distance",
-    "transform": false,
+    "transform": true,
     "params": [
         "ShadowDistance"
     ],

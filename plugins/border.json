@@ -2,7 +2,7 @@
     "name": "Border",
     "author": "9volt",
     "description": "Set the size of the border (outline)",
-    "transform": false,
+    "transform": true,
     "params": [
         "BorderSize"
     ],
