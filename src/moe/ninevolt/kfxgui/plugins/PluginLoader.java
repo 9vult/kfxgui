@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +50,12 @@ public class PluginLoader {
      */
     public Map<String, Plugin> getLoadedPlugins() {
         return plugins;
+    }
+
+    public ArrayList<String> getLoadedPluginNames() {
+        ArrayList<String> names = new ArrayList<>(plugins.keySet());
+        Collections.sort(names);
+        return names;
     }
     
 }

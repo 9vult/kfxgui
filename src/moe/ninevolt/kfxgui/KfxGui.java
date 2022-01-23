@@ -1,6 +1,8 @@
 package moe.ninevolt.kfxgui;
 
+import javafx.application.Application;
 import moe.ninevolt.kfxgui.gui.MainWindow;
+import moe.ninevolt.kfxgui.plugins.PluginLoader;
 
 /**
  * KfxGui.java
@@ -9,14 +11,20 @@ import moe.ninevolt.kfxgui.gui.MainWindow;
  */
 public class KfxGui {
 
-    private MainWindow mainWindow;
-    
+    private static PluginLoader pl;
+
     private KfxGui(String[] args) {
-        this.mainWindow = new MainWindow(args);
+        pl = new PluginLoader("./plugins");
+
+        Application.launch(MainWindow.class, args);
     }
 
     public static void main(String[] args) {
         new KfxGui(args);
+    }
+
+    public static PluginLoader getPluginLoader() {
+        return pl;
     }
 
 }

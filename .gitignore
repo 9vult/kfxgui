@@ -2,6 +2,7 @@
 ./bin/*
 ./libs
 ./libs/*
+libs/*
 *.class
 *.jar
 .classpath

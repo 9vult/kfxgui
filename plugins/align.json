@@ -1,0 +1,10 @@
+{
+    "name": "Align",
+    "author": "9volt",
+    "description": "Set the alignment of the object",
+    "transform": false,
+    "params": [
+        "Alignment"
+    ],
+    "format": "?an${Alignment}"
+}

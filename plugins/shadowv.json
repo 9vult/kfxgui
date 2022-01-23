@@ -1,0 +1,10 @@
+{
+    "name": "Shadow (Vertical)",
+    "author": "9volt",
+    "description": "Set the vertical shadow distance",
+    "transform": false,
+    "params": [
+        "ShadowDistance"
+    ],
+    "format": "?vshad${ShadowDistance}"
+}

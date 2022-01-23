@@ -2,33 +2,65 @@ package moe.ninevolt.kfxgui.gui;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.layout.StackPane;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import moe.ninevolt.kfxgui.KfxGui;
 
 public class MainWindow extends Application {
 
-    private Button button;
-
-    public MainWindow(String[] args) {
-        launch(args);
-    }
+    // Layout definitions
+    
+    BorderPane bp;
+    MenuBar menuBar;
+    Menu fileMenu;
+    MenuItem newMI;
+    MenuItem saveMI;
+    MenuItem openMI;
+    
+    Menu editMenu;
+    
+    VBox toolbox;
+    Label toolboxLabel;
+    ListView<String> pluginList;
 
     @Override
     public void start(Stage window) throws Exception {
+        setUserAgentStylesheet(STYLESHEET_MODENA);
+        // Initialize layout components
+        bp = new BorderPane();
+        menuBar = new MenuBar();
+        fileMenu = new Menu("File");
+        newMI = new MenuItem("New");
+        openMI = new MenuItem("Open");
+        saveMI = new MenuItem("Save");
+        editMenu = new Menu("Edit");
+        toolbox = new VBox();
+        toolboxLabel = new Label("Toolbox");
+        pluginList = new ListView<>();
+        
+        // Set up layout
         window.setTitle("9volt GUI Karaoke Templator");
+        
+        fileMenu.getItems().addAll(newMI, openMI, saveMI);
+        menuBar.getMenus().addAll(fileMenu, editMenu);
+        bp.setTop(menuBar);
 
-        button = new Button("Click Me");
-        button.setOnAction((event) -> {
-            button.setText("Hola");
-        });
+        toolboxLabel.setStyle("-fx-font-size: 16;");
+        pluginList.getItems().addAll(KfxGui.getPluginLoader().getLoadedPluginNames());
+        toolbox.getChildren().addAll(toolboxLabel, pluginList);
+        VBox.setVgrow(pluginList, Priority.ALWAYS);
+        bp.setLeft(toolbox);
 
-        StackPane layout = new StackPane();
-        layout.getChildren().add(button);
 
-        Scene scene = new Scene(layout, 300, 250);
-        window.setScene(scene);
+        Scene rootScene = new Scene(bp, 1280, 720);
+        window.setScene(rootScene);
         window.show();
     }
-
 }

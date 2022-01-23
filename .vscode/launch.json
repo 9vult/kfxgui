@@ -9,7 +9,8 @@
             "name": "Launch KFX-GUI",
             "request": "launch",
             "mainClass": "moe.ninevolt.kfxgui.KfxGui",
-            "projectName": "kfxgui"
+            "projectName": "kfxgui",
+            "vmArgs": "--module-path libs/javafx-sdk-11.0.1/lib --add-modules=javafx.controls"
         }
     ]
 }

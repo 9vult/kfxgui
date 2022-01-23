@@ -1,0 +1,10 @@
+{
+    "name": "Shadow (Horizontal)",
+    "author": "9volt",
+    "description": "Set the horizontal shadow distance",
+    "transform": false,
+    "params": [
+        "ShadowDistance"
+    ],
+    "format": "?hshad${ShadowDistance}"
+}
