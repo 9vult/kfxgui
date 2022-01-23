@@ -1,0 +1,10 @@
+{
+    "name": "ScaleX",
+    "author": "9volt",
+    "description": "Change the horizontal scale of the object",
+    "transform": true,
+    "params": [
+        "NewScale"
+    ],
+    "format": "?fscx${NewScale}"
+}

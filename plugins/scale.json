@@ -1,0 +1,10 @@
+{
+    "name": "Scale",
+    "author": "9volt",
+    "description": "Change both the horizontal and vertical scale of the object",
+    "transform": true,
+    "params": [
+        "NewScale"
+    ],
+    "format": "?fscx${NewScale}?fscy${NewScale}"
+}
