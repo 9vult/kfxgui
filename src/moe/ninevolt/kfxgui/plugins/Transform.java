@@ -1,6 +1,8 @@
 package moe.ninevolt.kfxgui.plugins;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Transform.java
@@ -21,12 +23,11 @@ public class Transform extends Plugin {
      * 
      */
     public Transform() {
-        super(  NAME, 
-                "9volt", 
-                "Non-linear transformation super-event", 
-                false, 
-                new String[] {START_TIME, END_TIME, VELOCITY},
-                ""
+        super(	NAME, 
+        		"9volt", 
+        		"Non-linear transformation super-event",
+        		false, Arrays.asList(START_TIME, END_TIME, VELOCITY), 
+        		""
         );
         this.children = new ArrayList<>();
     }
@@ -36,7 +37,7 @@ public class Transform extends Plugin {
     }
 
     /** Not used */
-    private Transform(String name, String author, String description, boolean transform, String[] params, String format) {
+    private Transform(String name, String author, String description, boolean transform, List<String> params, String format) {
         super(name, author, description, transform, params, format);
         this.children = new ArrayList<>();
     }

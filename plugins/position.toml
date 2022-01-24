@@ -1,0 +1,8 @@
+name = "Position"
+author = "9volt"
+description = "Position the object at an X, Y coordinate"
+transform = false
+params = [
+    "X", "Y"
+]
+format = "?pos(${X}, ${Y})"

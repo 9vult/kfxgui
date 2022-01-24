@@ -1,0 +1,8 @@
+name = "RotateX"
+author = "9volt"
+description = "Rotate the object along the X-axis"
+transform = true
+params = [
+    "NewAngle"
+]
+format = "?frx${NewAngle}"

@@ -6,3 +6,6 @@ libs/*
 *.class
 *.jar
 .classpath
+.settings
+.settings/*
+./.settings/*

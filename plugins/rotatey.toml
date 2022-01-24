@@ -1,0 +1,8 @@
+name = "RotateY"
+author = "9volt"
+description = "Rotate the object along the Y-axis"
+transform = true
+params = [
+    "NewAngle"
+]
+format = "?fry${NewAngle}"

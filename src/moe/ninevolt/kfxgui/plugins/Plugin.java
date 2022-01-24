@@ -1,7 +1,6 @@
 package moe.ninevolt.kfxgui.plugins;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,19 +17,19 @@ public class Plugin implements Comparable<Plugin> {
     private final String author;
     private final String description;
     private final boolean transform;
-    private final String[] params;
+    private final List<String> params;
 
     private String format;
     private Map<String, String> paramMap;
 
     /**
      * A plugin represents any generic feature supported by KFX-GUI.
-     * Plugins are created using a JSON file describing basic details
+     * Plugins are created using a TOML file describing basic details
      * about the action the plugin will perform, like the parameters
      * required and the resulting template code format.
      * 
      * <p>This constructor should not be used outside of initial
-     * loading from the JSON files. Use the copy constructor for
+     * loading from the TOML files. Use the copy constructor for
      * making usable plugin instances.</p>
      * @param name Name of the plugin
      * @param author Author of the plugin
@@ -39,13 +38,15 @@ public class Plugin implements Comparable<Plugin> {
      * @param params Parameters required by the plugin
      * @param format Output declaration using <code>${paramname}</code>
      */
-    public Plugin(String name, String author, String description, boolean transform, String[] params, String format) {
+    public Plugin(String name, String author, String description, boolean transform, List<String> params, String format) {
         this.name = name;
         this.author = author;
         this.description = description;
         this.transform = transform;
         this.params = params;
         this.format = format;
+        this.paramMap = new HashMap<>();
+        params.forEach(param -> paramMap.put(param, ""));
     }
 
     /**
@@ -64,7 +65,7 @@ public class Plugin implements Comparable<Plugin> {
         this.params = p.params;
         this.format = p.format;
         this.paramMap = new HashMap<>();
-        Arrays.stream(params).forEach(param -> paramMap.put(param, ""));
+        params.forEach(param -> paramMap.put(param, ""));
     }
 
     /**
@@ -116,7 +117,7 @@ public class Plugin implements Comparable<Plugin> {
         return transform;
     }
 
-    public String[] getParams() {
+    public List<String> getParams() {
         return params;
     }
 

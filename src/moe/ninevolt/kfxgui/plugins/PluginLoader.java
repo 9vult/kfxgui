@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.google.gson.Gson;
+import com.electronwill.nightconfig.core.file.FileConfig;
 
 /**
  * PluginLoader.java
@@ -20,7 +20,6 @@ import com.google.gson.Gson;
  */
 public class PluginLoader {
 
-    private Gson gson;
     private Map<String, Plugin> plugins;
 
     /**
@@ -28,15 +27,24 @@ public class PluginLoader {
      * @param pluginDirectory Directory plugins are located in
      */
     public PluginLoader(String pluginDirectory) {
-        gson = new Gson();
         plugins = new HashMap<>();
         try {
             List<Path> pluginPathList = Files.walk(Paths.get(pluginDirectory)).filter(Files::isRegularFile).collect(Collectors.toList());
 
             for (Path pluginPath : pluginPathList) {
-                if (!pluginPath.toString().endsWith("json")) continue;
-                Plugin p = gson.fromJson(Files.newBufferedReader(pluginPath), Plugin.class);
+                if (!pluginPath.toString().endsWith("toml")) continue;
+
+                FileConfig fc = FileConfig.of(pluginPath);
+                fc.load();
+
+                Plugin p = new Plugin(fc.get("name"), 
+                                        fc.get("author"), 
+                                        fc.get("description"), 
+                                        fc.get("transform"), 
+                                        fc.get("params"), 
+                                        fc.get("format"));
                 plugins.put(p.getName(), p);
+                fc.close();
             }
             // Load in the Transform "plugin"
             plugins.put(Transform.NAME, new Transform());

@@ -1,0 +1,8 @@
+name = "Shadow"
+author = "9volt"
+description = "Set the shadow distance"
+transform = true
+params = [
+    "ShadowDistance"
+]
+format = "?shad${ShadowDistance}"
