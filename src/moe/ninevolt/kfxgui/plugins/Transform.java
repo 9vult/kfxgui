@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import moe.ninevolt.kfxgui.template.TemplateItem;
+
 /**
  * Transform.java
  * Author: 9volt
@@ -11,7 +13,7 @@ import java.util.List;
  */
 public class Transform extends Plugin {
 
-    private ArrayList<Plugin> children;
+    private List<TemplateItem> children;
     private static final String START_TIME = "StartTime";
     private static final String END_TIME = "EndTime";
     private static final String VELOCITY = "Velocity";
@@ -46,7 +48,7 @@ public class Transform extends Plugin {
      * Get the child events contained within the Transform super-event
      * @return List of child events
      */
-    public ArrayList<Plugin> getChildren() {
+    public List<TemplateItem> getChildren() {
         return children;
     }
 
@@ -57,8 +59,9 @@ public class Transform extends Plugin {
                                     getParamMap().get(START_TIME),
                                     getParamMap().get(END_TIME),
                                     getParamMap().get(VELOCITY)));
-        for (Plugin child : children) {
-            result.append(child.getFormattedResult());
+        for (TemplateItem child : children) {
+            if (child instanceof Plugin)
+                result.append(((Plugin)child).getFormattedResult());
         }
         result.append(")");
         return result.toString();

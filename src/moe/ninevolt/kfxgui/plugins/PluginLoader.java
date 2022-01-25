@@ -13,6 +13,8 @@ import java.util.stream.Collectors;
 
 import com.electronwill.nightconfig.core.file.FileConfig;
 
+import moe.ninevolt.kfxgui.template.TemplateItem;
+
 /**
  * PluginLoader.java
  * Author: 9volt
@@ -78,11 +80,12 @@ public class PluginLoader {
      * Create a new instance of an action (plugin).
      * <p>Returns a copy of the "original" plugin instance
      * with the same base parameters.</p>
+     * @param parent Parent item of the plugin
      * @param name Name of the plugin to create
      * @return New copy of the specified plugin
      */
-    public Plugin create(String name) {
-        return new Plugin(plugins.get(name));
+    public Plugin create(TemplateItem parent, String name) {
+        return new Plugin(parent, plugins.get(name));
     }
     
 }

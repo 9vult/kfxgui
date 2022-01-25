@@ -7,11 +7,13 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import moe.ninevolt.kfxgui.template.TemplateItem;
+
 /**
  * Author: 9volt
  * Created: 2022/01/22
  */
-public class Plugin implements Comparable<Plugin> {
+public class Plugin extends TemplateItem implements Comparable<Plugin> {
 
     private final String name;
     private final String author;
@@ -39,6 +41,7 @@ public class Plugin implements Comparable<Plugin> {
      * @param format Output declaration using <code>${paramname}</code>
      */
     public Plugin(String name, String author, String description, boolean transform, List<String> params, String format) {
+        super(null);
         this.name = name;
         this.author = author;
         this.description = description;
@@ -57,7 +60,8 @@ public class Plugin implements Comparable<Plugin> {
      * co-exist.
      * @param p Plugin to copy
      */
-    public Plugin(Plugin p) {
+    public Plugin(TemplateItem parent, Plugin p) {
+        super(parent);
         this.name = p.name;
         this.author = p.author;
         this.description = p.description;
@@ -139,6 +143,11 @@ public class Plugin implements Comparable<Plugin> {
     @Override
     public int compareTo(Plugin o) {
         return this.name.compareTo(o.getName());
+    }
+
+    @Override
+    public String toString() {
+        return this.name;
     }
 
 }
