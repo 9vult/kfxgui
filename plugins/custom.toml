@@ -1,0 +1,8 @@
+name = "Custom"
+author = "9volt"
+description = "Manually write your own ASS code"
+transform = false
+params = [
+    "Code"
+]
+format = "${Code}"
