@@ -1,8 +1,11 @@
 package moe.ninevolt.kfxgui.gui;
 
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -12,6 +15,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeItem.TreeModificationEvent;
 import javafx.scene.control.TreeView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
@@ -140,9 +144,10 @@ public class MainWindow extends Application {
         tree.setShowRoot(false);
         TreeItem<TemplateItem> treeRoot = new TreeItem<>();
         tree.setRoot(treeRoot);
-        TemplateItem newLine = new Line(null, LineType.TEMPLATE, "New Line");
+        TemplateItem newLine = new Line(null, LineType.TEMPLATE_SYL, "New Line");
         TreeItem<TemplateItem> defaultRootLineItem = TemplateTreeItem.baseItem(newLine);
         treeRoot.getChildren().add(defaultRootLineItem);
+
         
         treeLabel.setStyle("-fx-font-size: 16;");
         addLineLabel.setStyle("-fx-font-size: 16; -fx-text-fill: blue;");
@@ -155,7 +160,7 @@ public class MainWindow extends Application {
             @Override
             public void handle(MouseEvent e) {
                 if (e.getClickCount() == 1) {
-                    TemplateItem newLine = new Line(null, LineType.TEMPLATE, "New Line");
+                    TemplateItem newLine = new Line(null, LineType.TEMPLATE_SYL, "New Line");
                     TreeItem<TemplateItem> lineItem = TemplateTreeItem.baseItem(newLine);
                     treeRoot.getChildren().add(lineItem);
                 }
@@ -210,6 +215,51 @@ public class MainWindow extends Application {
             } else if (selectedItem instanceof Line) {
                 Line selectedLine = (Line)selectedItem;
                 titleLabel.setText(selectedLine.getName());
+                // Line Type ComboBox
+                HBox typeHBox = new HBox();
+                Label typeLabel = new Label("Line Type");
+                ComboBox<LineType> typeBox = new ComboBox<>();
+                for (LineType type : LineType.values()) {
+                    typeBox.getItems().add(type);
+                }
+                Region typePaddingV = new Region();
+                Region typePaddingHleft = new Region();
+                Region typePaddingHright = new Region();
+                typePaddingV.setMinHeight(10);
+                typePaddingHleft.setMinWidth(12);
+                typePaddingHright.setMinWidth(12);
+                typeLabel.setMinWidth(100);
+                typeHBox.getChildren().addAll(typePaddingHleft, typeLabel, typeBox, typePaddingHright);
+                HBox.setHgrow(typeBox, Priority.ALWAYS);
+                paramGrandparentVBox.getChildren().addAll(typePaddingV, typeHBox);
+                typeBox.getSelectionModel().select(selectedLine.getType());
+                typeBox.setOnAction(e -> {
+                    selectedLine.setType(typeBox.getSelectionModel().getSelectedItem());
+                });
+
+                // Everything Else for Lines
+                for (String parameter : selectedLine.getParams()) {
+                    HBox paramParentHBox = new HBox();
+                    Label paramTitle = new Label(parameter);
+                    TextField paramInput = new TextField();
+                    paramInput.setText(selectedLine.getParamMap().get(parameter));
+                    paramInput.textProperty().addListener((observableText, oldValueText, newValueText) -> {
+                        selectedLine.setParam(parameter, newValueText);
+                        if (parameter.equals("Name")) titleLabel.setText(newValueText);
+                    });
+                    paramTitle.setMinWidth(200);
+                    HBox.setHgrow(paramInput, Priority.ALWAYS);
+                    // Padding, temporary
+                    Region vPaddingSmol = new Region();
+                    Region hPaddingLeft = new Region();
+                    Region hPaddingRight = new Region();
+                    vPaddingSmol.setMinHeight(10);
+                    hPaddingLeft.setMinWidth(12);
+                    hPaddingRight.setMinWidth(12);
+                    //
+                    paramParentHBox.getChildren().addAll(hPaddingLeft, paramTitle, paramInput, hPaddingRight);
+                    paramGrandparentVBox.getChildren().addAll(vPaddingSmol, paramParentHBox);
+                }
             }
         });
 

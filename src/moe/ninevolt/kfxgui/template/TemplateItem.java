@@ -3,6 +3,8 @@ package moe.ninevolt.kfxgui.template;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.beans.property.SimpleStringProperty;
+
 /**
  * TemplateItem.java
  * Author: 9volt
@@ -12,6 +14,7 @@ public class TemplateItem {
     
     private TemplateItem parent;
     private List<TemplateItem> children;
+    protected SimpleStringProperty nameProperty;
 
     public TemplateItem(TemplateItem parent) {
         this.parent = parent;
@@ -24,6 +27,10 @@ public class TemplateItem {
 
     public List<TemplateItem> getChildren() {
         return children;
+    }
+
+    public SimpleStringProperty nameProperty() {
+        return nameProperty;
     }
 
 }

@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javafx.beans.property.SimpleStringProperty;
 import moe.ninevolt.kfxgui.template.TemplateItem;
 
 /**
@@ -49,7 +50,8 @@ public class Plugin extends TemplateItem implements Comparable<Plugin> {
         this.params = params;
         this.format = format;
         this.paramMap = new HashMap<>();
-        params.forEach(param -> paramMap.put(param, ""));
+        this.params.forEach(param -> paramMap.put(param, ""));
+        this.nameProperty = new SimpleStringProperty(name);
     }
 
     /**
@@ -69,7 +71,8 @@ public class Plugin extends TemplateItem implements Comparable<Plugin> {
         this.params = p.params;
         this.format = p.format;
         this.paramMap = new HashMap<>();
-        params.forEach(param -> paramMap.put(param, ""));
+        this.params.forEach(param -> paramMap.put(param, ""));
+        this.nameProperty = new SimpleStringProperty(name);
     }
 
     /**
