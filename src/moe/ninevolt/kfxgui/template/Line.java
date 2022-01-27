@@ -17,16 +17,20 @@ public class Line extends TemplateItem {
     }
 
     public LineType getType() {
-        return type;
+        return this.type;
     }
 
     public void setType(LineType type) {
         this.type = type;
     }
 
+    public String getName() {
+        return this.name;
+    }
+
     @Override
     public String toString() {
-        return name;
+        return this.name;
     }
 
 }

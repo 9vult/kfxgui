@@ -1,0 +1,8 @@
+name = "Retime"
+author = "9volt"
+description = "Retime a line"
+transform = false
+params = [
+    "RetimeTo", "BeginOffset", "EndOffset"
+]
+format = '!retime(!"${RetimeTo}", ${BeginOffset}, ${EndOffset})!'

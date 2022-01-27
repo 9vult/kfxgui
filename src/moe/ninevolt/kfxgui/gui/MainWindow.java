@@ -1,7 +1,5 @@
 package moe.ninevolt.kfxgui.gui;
 
-import java.util.List;
-
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
@@ -11,6 +9,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
@@ -40,9 +39,11 @@ public class MainWindow extends Application {
     BorderPane bp;
     MenuBar menuBar;
     Menu fileMenu;
-    MenuItem nMI;
+    MenuItem atarashiiMI;
     MenuItem saveMI;
+    MenuItem saveAsMI;
     MenuItem openMI;
+    MenuItem exportMI;
     
     Menu editMenu;
     
@@ -63,9 +64,11 @@ public class MainWindow extends Application {
         bp = new BorderPane();
         menuBar = new MenuBar();
         fileMenu = new Menu("File");
-        nMI = new MenuItem("New");
+        atarashiiMI = new MenuItem("New");
         openMI = new MenuItem("Open");
         saveMI = new MenuItem("Save");
+        saveAsMI = new MenuItem("Save As...");
+        exportMI = new MenuItem("Export...");
         editMenu = new Menu("Edit");
         toolbox = new VBox();
         toolboxLabel = new Label("Toolbox");
@@ -79,8 +82,8 @@ public class MainWindow extends Application {
         // Set up layout
         window.setTitle("9volt GUI Karaoke Template Builder");
         
-        fileMenu.getItems().addAll(nMI, openMI, saveMI);
-        menuBar.getMenus().addAll(fileMenu, editMenu);
+        fileMenu.getItems().addAll(atarashiiMI, openMI, saveMI, saveAsMI, exportMI);
+        menuBar.getMenus().addAll(editMenu);
         bp.setTop(menuBar);
 
         // Toolbox
@@ -113,12 +116,18 @@ public class MainWindow extends Application {
                         Plugin selectedPlugin = new Plugin(cItem.getValue(), genericPlugin);
                         cItem.getChildren().add(new TemplateTreeItem<String>(selectedPlugin, selectedPlugin.getName()));
                         cItem.getValue().getChildren().add(selectedPlugin);
-                    } else { // Add to the parent line or transform
+                    } else { // Cannot add to a "regular" plugin, go up a level
                         Plugin selectedPlugin = new Plugin(cItem.getParent().getValue(), genericPlugin);
-                        cItem.getParent().getChildren().add(new TemplateTreeItem<String>(selectedPlugin, selectedPlugin.getName()));
-                        cItem.getParent().getValue().getChildren().add(selectedPlugin);
+                        if (cItem.getParent().getValue().toString().equals(Transform.NAME) && selectedPlugin.getName().equals(Transform.NAME)) {
+                            // Need to go up to grandparent level, can't add transform to transform!
+                            cItem.getParent().getParent().getChildren().add(new TemplateTreeItem<String>(selectedPlugin, selectedPlugin.getName()));
+                            cItem.getParent().getParent().getValue().getChildren().add(selectedPlugin);
+                        } else {
+                            // Add to the parent level
+                            cItem.getParent().getChildren().add(new TemplateTreeItem<String>(selectedPlugin, selectedPlugin.getName()));
+                            cItem.getParent().getValue().getChildren().add(selectedPlugin);
+                        }
                     }
-                    
                 }
             }            
         });
@@ -132,9 +141,8 @@ public class MainWindow extends Application {
         TreeItem<TemplateItem> treeRoot = new TreeItem<>();
         tree.setRoot(treeRoot);
         TemplateItem newLine = new Line(null, LineType.TEMPLATE, "New Line");
-        TreeItem<TemplateItem> lineItem = TemplateTreeItem.baseItem(newLine);
-        treeRoot.getChildren().add(lineItem);
-        tree.getSelectionModel().select(lineItem);
+        TreeItem<TemplateItem> defaultRootLineItem = TemplateTreeItem.baseItem(newLine);
+        treeRoot.getChildren().add(defaultRootLineItem);
         
         treeLabel.setStyle("-fx-font-size: 16;");
         addLineLabel.setStyle("-fx-font-size: 16; -fx-text-fill: blue;");
@@ -154,11 +162,67 @@ public class MainWindow extends Application {
             }
         });
 
+        VBox paramGrandparentVBox = new VBox();
+        tree.getSelectionModel()
+        .selectedItemProperty()
+        .addListener((observable, oldValue, newValue) -> {
+            // Clear the box
+            paramGrandparentVBox.getChildren().clear();
+            Region vPaddingBeeg = new Region();
+            vPaddingBeeg.setMinHeight(20);
+            
+            // Heading
+            HBox heading = new HBox();
+            Region headLeft = new Region();
+            Region headRight = new Region();
+            Label titleLabel = new Label();
+            heading.getChildren().addAll(headLeft, titleLabel, headRight);
+            HBox.setHgrow(headLeft, Priority.ALWAYS);
+            HBox.setHgrow(headRight, Priority.ALWAYS);
+            titleLabel.setStyle("-fx-font-size: 22; -fx-font-weight: Bold;");
+            paramGrandparentVBox.getChildren().addAll(vPaddingBeeg, heading);
+
+            TemplateItem selectedItem = newValue.getValue();
+            if (selectedItem instanceof Plugin) {
+                Plugin selectedPlugin = (Plugin)selectedItem;
+                titleLabel.setText(selectedPlugin.getName());
+                for (String parameter : selectedPlugin.getParams()) {
+                    HBox paramParentHBox = new HBox();
+                    Label paramTitle = new Label(parameter);
+                    TextField paramInput = new TextField();
+                    paramInput.setText(selectedPlugin.getParamMap().get(parameter));
+                    paramInput.textProperty().addListener((observableText, oldValueText, newValueText) -> {
+                        selectedPlugin.setParam(parameter, newValueText);
+                    });
+                    paramTitle.setMinWidth(100);
+                    HBox.setHgrow(paramInput, Priority.ALWAYS);
+                    // Padding, temporary
+                    Region vPaddingSmol = new Region();
+                    Region hPaddingLeft = new Region();
+                    Region hPaddingRight = new Region();
+                    vPaddingSmol.setMinHeight(10);
+                    hPaddingLeft.setMinWidth(12);
+                    hPaddingRight.setMinWidth(12);
+                    //
+                    paramParentHBox.getChildren().addAll(hPaddingLeft, paramTitle, paramInput, hPaddingRight);
+                    paramGrandparentVBox.getChildren().addAll(vPaddingSmol, paramParentHBox);
+                }
+            } else if (selectedItem instanceof Line) {
+                Line selectedLine = (Line)selectedItem;
+                titleLabel.setText(selectedLine.getName());
+            }
+        });
+
+        bp.setCenter(paramGrandparentVBox);
+
         treeBox.getChildren().addAll(treeHBox, tree);
         VBox.setVgrow(tree, Priority.ALWAYS);
         bp.setRight(treeBox);
 
-        Scene rootScene = new Scene(bp, 1280, 720);
+        // Window Finalization
+        
+        tree.getSelectionModel().select(defaultRootLineItem);
+        Scene rootScene = new Scene(bp, 1100, 605);
         window.setScene(rootScene);
         window.show();
     }

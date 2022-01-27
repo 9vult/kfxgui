@@ -1,7 +1,7 @@
 name = "Blur"
 author = "9volt"
 description = "Set the blurriness of the object"
-transform = false
+transform = true
 params = [
     "Blur"
 ]
