@@ -1,67 +1,48 @@
 package moe.ninevolt.kfxgui.plugins;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import moe.ninevolt.kfxgui.template.TemplateItem;
 
 /**
- * Transform.java
- * Author: 9volt
- * Created: 2022/01/23
+ * Transform is a special TemplateItem
+ * that supports the \t transform tag
+ * in the template.
+ * <p>It, along with Line, are the only
+ * TemplateItem implementations
+ * that actually use children.
+ * 
+ * @author 9volt
+ * @since 2022/01/23
  */
-public class Transform extends Plugin {
+public class Transform extends TemplateItem {
 
-    private List<TemplateItem> children;
     private static final String START_TIME = "StartTime";
     private static final String END_TIME = "EndTime";
     private static final String VELOCITY = "Velocity";
     public static final String NAME = "(Transform)";
 
-    /**
-     * A Transform super-event is a special event
-     * that hosts child events (plugins) within it.
-     * 
-     */
-    public Transform() {
-        super(	NAME, 
-        		"9volt", 
-        		"Non-linear transformation super-event",
-        		false, Arrays.asList(START_TIME, END_TIME, VELOCITY), 
-        		""
-        );
-        this.children = new ArrayList<>();
-    }
-
-    public Transform(Plugin p) {
-        this();
-    }
-
-    /** Not used */
-    private Transform(String name, String author, String description, boolean transform, List<String> params, String format) {
-        super(name, author, description, transform, params, format);
-        this.children = new ArrayList<>();
-    }
-
-    /**
-     * Get the child events contained within the Transform super-event
-     * @return List of child events
-     */
-    public List<TemplateItem> getChildren() {
-        return children;
+    public Transform(TemplateItem parent) {
+        super(parent, 
+            List.of(START_TIME, END_TIME, VELOCITY), 
+            Transform.NAME,
+            "Non-linear Transformation",
+            false);
+        setParam(VELOCITY, "1");
     }
 
     @Override
     public String getFormattedResult() {
+        String sTime = getParamMap().get(START_TIME);
+        String eTime = getParamMap().get(END_TIME);
+        String veloc = getParamMap().get(VELOCITY);
         StringBuilder result = new StringBuilder();
-        result.append(String.format("?(%s, %s, %s,",
-                                    getParamMap().get(START_TIME),
-                                    getParamMap().get(END_TIME),
-                                    getParamMap().get(VELOCITY)));
+        result.append(String.format("?t(%s, %s, %s,",
+                                    sTime,
+                                    eTime,
+                                    veloc));
         for (TemplateItem child : children) {
-            if (child instanceof Plugin)
-                result.append(((Plugin)child).getFormattedResult());
+            result.append(child.getFormattedResult());
         }
         result.append(")");
         return result.toString();

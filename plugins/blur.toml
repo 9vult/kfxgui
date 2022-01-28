@@ -5,4 +5,4 @@ transform = true
 params = [
     "Blur"
 ]
-format = "?blur${Blue}"
+format = "?blur${Blur}"

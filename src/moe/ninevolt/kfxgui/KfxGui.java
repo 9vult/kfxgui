@@ -20,6 +20,7 @@ public class KfxGui {
     }
 
     public static void main(String[] args) {
+        System.out.println("\n\n\n\n\n\n\n");
         new KfxGui(args);
     }
 

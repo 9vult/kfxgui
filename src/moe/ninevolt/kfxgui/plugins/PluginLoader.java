@@ -22,7 +22,7 @@ import moe.ninevolt.kfxgui.template.TemplateItem;
  */
 public class PluginLoader {
 
-    private Map<String, Plugin> plugins;
+    private Map<String, Path> plugins;
 
     /**
      * The PluginLoader is responsible for loading and managing plugins.
@@ -35,21 +35,12 @@ public class PluginLoader {
 
             for (Path pluginPath : pluginPathList) {
                 if (!pluginPath.toString().endsWith("toml")) continue;
-
                 FileConfig fc = FileConfig.of(pluginPath);
                 fc.load();
-
-                Plugin p = new Plugin(fc.get("name"), 
-                                        fc.get("author"), 
-                                        fc.get("description"), 
-                                        fc.get("transform"), 
-                                        fc.get("params"), 
-                                        fc.get("format"));
-                plugins.put(p.getName(), p);
+                this.plugins.put(fc.get("name"), pluginPath);
                 fc.close();
             }
-            // Load in the Transform "plugin"
-            plugins.put(Transform.NAME, new Transform());
+            this.plugins.put(Transform.NAME, null);
             
         } catch (IOException ioe) {
             System.err.println(String.format("PluginLoader: %s", ioe.getMessage()));
@@ -60,10 +51,16 @@ public class PluginLoader {
      * Get the list of loaded plugins
      * @return Map of loaded plugins
      */
-    public ArrayList<Plugin> getSortedPlugins() {
-        ArrayList<Plugin> values = new ArrayList<>(plugins.values());
-        Collections.sort(values);
-        return values;
+    public List<TemplateItem> getSortedPlugins() {
+        List<String> names = new ArrayList<>();
+        names.addAll(plugins.keySet());
+        Collections.sort(names);
+
+        List<TemplateItem> pluginList = new ArrayList<>();
+        for (String name : names)
+            pluginList.add(this.create(null, name));
+
+        return pluginList;
     }
 
     /**
@@ -84,8 +81,21 @@ public class PluginLoader {
      * @param name Name of the plugin to create
      * @return New copy of the specified plugin
      */
-    public Plugin create(TemplateItem parent, String name) {
-        return new Plugin(parent, plugins.get(name));
+    public TemplateItem create(TemplateItem parent, String name) {
+        if (name.equals(Transform.NAME)) return new Transform(parent);
+
+        FileConfig fc = FileConfig.of(plugins.get(name));
+        fc.load();
+
+        Plugin p = new Plugin(parent,
+                            fc.get("params"),
+                            fc.get("name"), 
+                            fc.get("author"), 
+                            fc.get("description"), 
+                            fc.get("transform"), 
+                            fc.get("format"));
+        fc.close();
+        return p;
     }
     
 }
