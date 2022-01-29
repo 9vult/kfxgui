@@ -32,6 +32,7 @@ public class Line extends TemplateItem {
         setParam(STYLE, "Default");
         setParam(LAYER, "0");
         setParam(ADDITIONAL, "");
+        setParam(ACTOR, "");
     }
     
     public LineType getType() {
@@ -73,7 +74,11 @@ public class Line extends TemplateItem {
 
         if (type.toString().contains("template")) result.append(LBRACE);
         for (TemplateItem item : getChildren()) {
-            result.append(item.getFormattedResult());
+            try {
+                result.append(item.getFormattedResult());
+            } catch (Exception e) {
+                System.out.println("Error on " + item.toString());
+            }
         }
         if (type.toString().contains("template")) result.append(RBRACE);
         return result.toString();

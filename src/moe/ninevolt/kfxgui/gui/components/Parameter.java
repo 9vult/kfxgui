@@ -6,6 +6,13 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 
+/**
+ * A Parameter provides a label and a text entry field
+ * for supplying values to a TemplateItem
+ * 
+ * @author 9volt
+ * @since 2022/01/29
+ */
 public class Parameter extends HBox {
 
     private Label title;
@@ -13,6 +20,9 @@ public class Parameter extends HBox {
     private Region paddingLeft = new Region();
     private Region paddingRight = new Region();
 
+    /**
+     * Initialize a Parameter
+     */
     public Parameter() {
         this.title = new Label();
         this.inputArea = new TextField();
@@ -27,10 +37,16 @@ public class Parameter extends HBox {
         this.getChildren().addAll(paddingLeft, title, inputArea, paddingRight);
     }
 
+    /**
+     * @return Reference to the Title
+     */
     public Label getTitle() {
         return this.title;
     }
 
+    /**
+     * @return Reference to the InputArea
+     */
     public TextField getInputArea() {
         return this.inputArea;
     }

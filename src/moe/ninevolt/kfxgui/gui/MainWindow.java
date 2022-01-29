@@ -72,8 +72,7 @@ public class MainWindow extends Application {
         projectTree = new ProjectTree();
         toolbox = new Toolbox(projectTree.getTree());
 
-        // Set up layout
-        window.setTitle("9volt GUI Karaoke Template Builder");
+        // Menu strip
         
         fileMenu.getItems().addAll(atarashiiMI, openMI, saveMI, saveAsMI, new SeparatorMenuItem(), exportsMI, exportfMI);
         projectMenu.getItems().addAll(targetMI);
@@ -120,6 +119,7 @@ public class MainWindow extends Application {
         // Window Finalization
         
         projectTree.getTree().getSelectionModel().select(0);
+        window.setTitle("9volt GUI Karaoke Template Builder");
         Scene rootScene = new Scene(bp, 1100, 605);
         window.setScene(rootScene);
         window.show();

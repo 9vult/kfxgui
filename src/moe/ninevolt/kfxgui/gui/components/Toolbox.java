@@ -14,12 +14,23 @@ import moe.ninevolt.kfxgui.plugins.Transform;
 import moe.ninevolt.kfxgui.template.Line;
 import moe.ninevolt.kfxgui.template.TemplateItem;
 
+/**
+ * Left-hand panel containing the list of
+ * loaded events that can be used in the project
+ * 
+ * @author 9volt
+ * @since 2022/01/29
+ */
 public class Toolbox extends VBox {
     
     Label heading;
     ListView<TemplateItem> pluginList;
     TreeView<TemplateItem> tree;
 
+    /**
+     * Initialize the Toolbox
+     * @param tree Tree being used
+     */
     public Toolbox(TreeView<TemplateItem> tree) {
         this.tree = tree;
         heading = new Label("Toolbox");
@@ -30,6 +41,9 @@ public class Toolbox extends VBox {
         this.getChildren().addAll(heading, pluginList);
     }
 
+    /**
+     * GUI setup helper method
+     */
     private void setup() {
         pluginList.getItems().addAll(KfxGui.getPluginLoader().getSortedPlugins());
         heading.setStyle("-fx-font-size: 16;");

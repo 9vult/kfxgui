@@ -11,6 +11,15 @@ import moe.ninevolt.kfxgui.KfxGui;
 import moe.ninevolt.kfxgui.template.Line;
 import moe.ninevolt.kfxgui.template.LineType;
 
+/**
+ * The combo box area is the area of the
+ * Line parameter panel where the line
+ * type is defined using the combo box and
+ * text input field
+ * 
+ * @author 9volt
+ * @since 2022/01/29
+ */
 public class ComboBoxArea extends HBox {
 
     private VBox left;
@@ -24,6 +33,9 @@ public class ComboBoxArea extends HBox {
     private Region paddingMiddle = new Region();
     private Region paddingRight = new Region();
 
+    /**
+     * Initialize the ComboBoxArea
+     */
     public ComboBoxArea() {
         this.left = new VBox();
         this.right = new VBox();
@@ -44,6 +56,9 @@ public class ComboBoxArea extends HBox {
         this.getChildren().addAll(paddingLeft, left, paddingMiddle, right, paddingRight);
     }
 
+    /**
+     * Update the list of types that populates the ComboBox
+     */
     public void updateTypeList() {
         String prevText = typeBox.getValue();
         typeBox.getItems().clear();
@@ -53,10 +68,16 @@ public class ComboBoxArea extends HBox {
         typeBox.setValue(prevText);
     }
 
+    /**
+     * @return Reference to the ComboBox
+     */
     public ComboBox<String> getTypeBox() {
         return this.typeBox;
     }
 
+    /**
+     * @return Reference to the additional parameters field
+     */
     public TextField getAdditionalField() {
         return this.additionalField;
     }

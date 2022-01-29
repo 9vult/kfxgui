@@ -13,6 +13,13 @@ import moe.ninevolt.kfxgui.template.Line;
 import moe.ninevolt.kfxgui.template.LineType;
 import moe.ninevolt.kfxgui.template.TemplateItem;
 
+/**
+ * Right-hand panel containing the project's
+ * tree structure
+ * 
+ * @author 9volt
+ * @since 2022/01/29
+ */
 public class ProjectTree extends VBox {
     
     HBox top;
@@ -20,6 +27,9 @@ public class ProjectTree extends VBox {
     Label addLabel;
     TreeView<TemplateItem> tree;
 
+    /**
+     * Initialize the ProjectTree panel
+     */
     public ProjectTree() {
         this.top = new HBox();
         this.treeLabel = new Label("Project Tree");
@@ -32,6 +42,9 @@ public class ProjectTree extends VBox {
         this.getChildren().addAll(top, tree);
     }
 
+    /**
+     * GUI setup helper method
+     */
     private void setup() {
         treeLabel.setStyle("-fx-font-size: 16;");
         addLabel.setStyle("-fx-font-size: 16; -fx-text-fill: blue;");
@@ -57,6 +70,9 @@ public class ProjectTree extends VBox {
         });
     }
 
+    /**
+     * @return Reference to the project tree
+     */
     public TreeView<TemplateItem> getTree() {
         return this.tree;
     }
