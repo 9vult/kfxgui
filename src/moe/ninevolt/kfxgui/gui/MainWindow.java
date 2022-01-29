@@ -17,16 +17,14 @@ import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import moe.ninevolt.kfxgui.KfxGui;
 import moe.ninevolt.kfxgui.gui.components.ParamArea;
+import moe.ninevolt.kfxgui.gui.components.ProjectTree;
 import moe.ninevolt.kfxgui.plugins.Plugin;
 import moe.ninevolt.kfxgui.plugins.Transform;
 import moe.ninevolt.kfxgui.template.Line;
@@ -62,13 +60,8 @@ public class MainWindow extends Application {
     Label toolboxLabel;
     ListView<TemplateItem> pluginList;
 
-    VBox treeBox;
-    HBox treeHBox;
-    Label treeLabel;
-    Label addLineLabel;
-    TreeView<TemplateItem> tree;
-
     ParamArea currentDisplay;
+    ProjectTree projectTree;
 
     @Override
     public void start(Stage window) throws Exception {
@@ -90,11 +83,8 @@ public class MainWindow extends Application {
         toolbox = new VBox();
         toolboxLabel = new Label("Toolbox");
         pluginList = new ListView<>();
-        treeBox = new VBox();
-        treeHBox = new HBox();
-        addLineLabel = new Label("+ ");
-        treeLabel = new Label("Template Tree");
-        tree = new TreeView<>();
+
+        projectTree = new ProjectTree();
 
         // Set up layout
         window.setTitle("9volt GUI Karaoke Template Builder");
@@ -119,7 +109,7 @@ public class MainWindow extends Application {
 
         // MenuStrip
         exportsMI.setOnAction(e -> {
-            for (TreeItem<TemplateItem> treeItem : tree.getRoot().getChildren()) {
+            for (TreeItem<TemplateItem> treeItem : projectTree.getTree().getRoot().getChildren()) {
                 TemplateItem templateItem = treeItem.getValue();
                 System.out.println(Plugin.normalizeOutput(templateItem.getFormattedResult(), false));
             }
@@ -146,7 +136,7 @@ public class MainWindow extends Application {
             public void handle(MouseEvent e) {
                 if (e.getClickCount() == 2) {
                     TemplateItem selectedItem = pluginList.getSelectionModel().getSelectedItem();                    
-                    TreeItem<TemplateItem> curItem = tree.getSelectionModel().getSelectedItem();
+                    TreeItem<TemplateItem> curItem = projectTree.getTree().getSelectionModel().getSelectedItem();
                     TemplateTreeItem<String> addingItem;
 
                     if (curItem == null) return;
@@ -176,7 +166,7 @@ public class MainWindow extends Application {
                     for (TreeItem<TemplateItem> ti = addingItem; ti.getParent() != null; ti = ti.getParent()) {
                         ti.getParent().setExpanded(true);
                     }
-                    tree.getSelectionModel().select(tree.getRow(addingItem));
+                    projectTree.getTree().getSelectionModel().select(projectTree.getTree().getRow(addingItem));
                 }
             }            
         });
@@ -184,36 +174,9 @@ public class MainWindow extends Application {
         VBox.setVgrow(pluginList, Priority.ALWAYS);
         bp.setLeft(toolbox);
 
-        // Effect Tree
-
-        tree.setShowRoot(false);
-        TreeItem<TemplateItem> treeRoot = new TreeItem<>();
-        tree.setRoot(treeRoot);
-        TemplateItem newLine = new Line(LineType.make("template syl"), "New Line");
-        TreeItem<TemplateItem> defaultRootLineItem = TemplateTreeItem.baseItem(newLine);
-        treeRoot.getChildren().add(defaultRootLineItem);
+        // Project Tree
         
-        treeLabel.setStyle("-fx-font-size: 16;");
-        addLineLabel.setStyle("-fx-font-size: 16; -fx-text-fill: blue;");
-        addLineLabel.setTooltip(new Tooltip("Add Line..."));
-        Region spacerRegion = new Region();
-        treeHBox.getChildren().addAll(treeLabel, spacerRegion, addLineLabel);
-        HBox.setHgrow(spacerRegion, Priority.ALWAYS);
-
-        addLineLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent e) {
-                if (e.getClickCount() == 1) {
-                    TemplateItem newLine = new Line(LineType.make("template syl"), "New Line");
-                    TreeItem<TemplateItem> lineItem = TemplateTreeItem.baseItem(newLine);
-                    treeRoot.getChildren().add(lineItem);
-                }
-            }
-        });
-
-        // Parameter Input Area
-
-        tree.getSelectionModel()
+        projectTree.getTree().getSelectionModel()
         .selectedItemProperty()
         .addListener((observable, oldValue, newValue) -> {
             TemplateItem selectedItem = newValue.getValue();
@@ -221,14 +184,11 @@ public class MainWindow extends Application {
             bp.setCenter(currentDisplay);
         });
         
-
-        treeBox.getChildren().addAll(treeHBox, tree);
-        VBox.setVgrow(tree, Priority.ALWAYS);
-        bp.setRight(treeBox);
+        bp.setRight(projectTree);
 
         // Window Finalization
         
-        tree.getSelectionModel().select(defaultRootLineItem);
+        projectTree.getTree().getSelectionModel().select(0);
         Scene rootScene = new Scene(bp, 1100, 605);
         window.setScene(rootScene);
         window.show();
