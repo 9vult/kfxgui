@@ -41,6 +41,9 @@ public abstract class TemplateItem {
         this.transform = new SimpleBooleanProperty(transform);
         this.children = new ArrayList<>();
         this.paramMap = new HashMap<>();
+        this.params.forEach((e) -> {
+            paramMap.put(e, "");
+        });
     }
 
     /**
