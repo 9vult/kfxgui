@@ -52,6 +52,10 @@ public abstract class TemplateItem {
         return this.parent;
     }
 
+    public void setParent(TemplateItem parent) {
+        this.parent = parent;
+    }
+
     /**
      * Get the children this item contains
      * @return The children

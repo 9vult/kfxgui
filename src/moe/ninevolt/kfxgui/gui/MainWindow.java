@@ -13,6 +13,7 @@ import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.TreeItem;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import moe.ninevolt.kfxgui.KfxGui;
 import moe.ninevolt.kfxgui.gui.components.ParamArea;
@@ -94,10 +95,15 @@ public class MainWindow extends Application {
 
         // MenuStrip
         exportsMI.setOnAction(e -> {
+            StringBuilder sb = new StringBuilder();
             for (TreeItem<TemplateItem> treeItem : projectTree.getTree().getRoot().getChildren()) {
                 TemplateItem templateItem = treeItem.getValue();
-                System.out.println(Plugin.normalizeOutput(templateItem.getFormattedResult(), false));
+                sb.append(Plugin.normalizeOutput(templateItem.getFormattedResult(), false));
+                sb.append("\n");
             }
+            ExportTextWindow etw = new ExportTextWindow(sb.toString());
+            etw.initModality(Modality.APPLICATION_MODAL);
+            etw.show();
         });
 
         // Toolbox

@@ -62,38 +62,77 @@ public class Toolbox extends VBox {
 
         pluginList.setOnMouseClicked((e) -> {
             if (e.getClickCount() != 2) return;
-            TemplateItem selectedItem = pluginList.getSelectionModel().getSelectedItem();                    
-                    TreeItem<TemplateItem> curItem = tree.getSelectionModel().getSelectedItem();
-                    TemplateTreeItem<String> addingItem;
+            TemplateItem selectedToolboxItem = pluginList.getSelectionModel().getSelectedItem();                    
+            TreeItem<TemplateItem> selectedTreeItem = tree.getSelectionModel().getSelectedItem();
+            TemplateItem newTemplateItem = KfxGui.getPluginLoader().create(null, selectedToolboxItem.nameProperty().get());
 
-                    if (curItem == null) return;
-                    if ((curItem.getValue() instanceof Transform && selectedItem.transformProperty().get()) 
-                            || curItem.getValue() instanceof Line) {
-                        // Add to the current line or transform
-                        TemplateItem newItem = KfxGui.getPluginLoader().create(curItem.getValue(), selectedItem.nameProperty().get());
-                        addingItem = new TemplateTreeItem<>(newItem, newItem.nameProperty().get());
-                        curItem.getChildren().add(addingItem);
-                        curItem.getValue().getChildren().add(newItem);
+            TreeItem<TemplateItem> newTreeItem = TemplateTreeItem.baseItem(newTemplateItem);
+            TemplateItem selectedTreeTemplateItem = selectedTreeItem.getValue();
 
-                    } else { // Cannot add to a "regular" plugin, go up a level
-                    TemplateItem newItem = KfxGui.getPluginLoader().create(curItem.getParent().getValue(), selectedItem.nameProperty().get());
-                        if (curItem.getParent().getValue() instanceof Transform && newItem instanceof Transform) {
-                            // Need to go up to grandparent level, can't add transform to transform!
-                            addingItem = new TemplateTreeItem<>(newItem, newItem.nameProperty().get());
-                            curItem.getParent().getParent().getChildren().add(addingItem);
-                            curItem.getParent().getParent().getValue().getChildren().add(newItem);
-                        } else {
-                            // Add to the parent level
-                            addingItem = new TemplateTreeItem<>(newItem, newItem.nameProperty().get());
-                            curItem.getParent().getChildren().add(addingItem);
-                            curItem.getParent().getValue().getChildren().add(newItem);
-                        }
+            if (selectedToolboxItem instanceof Transform && selectedTreeTemplateItem instanceof Transform) {
+                selectedTreeTemplateItem.getParent().getChildren().add(selectedToolboxItem);
+                selectedTreeItem.getParent().getChildren().add(newTreeItem);
+                newTemplateItem.setParent(selectedTreeTemplateItem.getParent());
+            } else 
+            if (selectedToolboxItem instanceof Transform && selectedTreeTemplateItem instanceof Line) {
+                selectedTreeTemplateItem.getChildren().add(selectedToolboxItem);
+                selectedTreeItem.getChildren().add(newTreeItem);
+                newTemplateItem.setParent(selectedTreeTemplateItem);
+            } else
+            if (selectedToolboxItem instanceof Transform) {
+                if (selectedTreeTemplateItem.getParent() instanceof Line) {
+                    selectedTreeTemplateItem.getParent().getChildren().add(selectedToolboxItem);
+                    selectedTreeItem.getParent().getChildren().add(newTreeItem);
+                    newTemplateItem.setParent(selectedTreeTemplateItem.getParent());
+                } else
+                if (selectedTreeTemplateItem.getParent() instanceof Transform) {
+                    selectedTreeTemplateItem.getParent().getParent().getChildren().add(selectedToolboxItem);
+                    selectedTreeItem.getParent().getParent().getChildren().add(newTreeItem);
+                    newTemplateItem.setParent(selectedTreeTemplateItem.getParent().getParent());
+                } else {
+                    selectedTreeTemplateItem.getChildren().add(selectedToolboxItem);
+                    selectedTreeItem.getChildren().add(newTreeItem);
+                    newTemplateItem.setParent(selectedTreeTemplateItem);
+                }
+            } else {
+                if (selectedTreeTemplateItem instanceof Line) {
+                    selectedTreeTemplateItem.getChildren().add(selectedToolboxItem);
+                    selectedTreeItem.getChildren().add(newTreeItem);
+                    newTemplateItem.setParent(selectedTreeTemplateItem);
+                } else
+                if (selectedTreeTemplateItem.getParent() instanceof Transform) {
+                    if (selectedToolboxItem.transformProperty().get()) {
+                        selectedTreeTemplateItem.getParent().getChildren().add(selectedToolboxItem);
+                        selectedTreeItem.getParent().getChildren().add(newTreeItem);
+                        newTemplateItem.setParent(selectedTreeTemplateItem.getParent());
+                    } else {
+                        selectedTreeTemplateItem.getParent().getParent().getChildren().add(selectedToolboxItem);
+                        selectedTreeItem.getParent().getParent().getChildren().add(newTreeItem);
+                        newTemplateItem.setParent(selectedTreeTemplateItem.getParent().getParent());
                     }
-                    // Select it (and expand parents)
-                    for (TreeItem<TemplateItem> ti = addingItem; ti.getParent() != null; ti = ti.getParent()) {
-                        ti.getParent().setExpanded(true);
+                } else
+                if (selectedTreeTemplateItem instanceof Transform) {
+                    if (selectedToolboxItem.transformProperty().get()) {
+                        selectedTreeTemplateItem.getChildren().add(selectedToolboxItem);
+                        selectedTreeItem.getChildren().add(newTreeItem);
+                        newTemplateItem.setParent(selectedTreeTemplateItem);
+                    } else {
+                        selectedTreeTemplateItem.getParent().getChildren().add(selectedToolboxItem);
+                        selectedTreeItem.getParent().getChildren().add(newTreeItem);
+                        newTemplateItem.setParent(selectedTreeTemplateItem.getParent());
                     }
-                    tree.getSelectionModel().select(tree.getRow(addingItem));
+                } else {
+                    selectedTreeTemplateItem.getParent().getChildren().add(selectedToolboxItem);
+                    selectedTreeItem.getParent().getChildren().add(newTreeItem);
+                    newTemplateItem.setParent(selectedTreeTemplateItem.getParent());
+                }
+            }
+                    
+            // Select it (and expand parents)
+            for (TreeItem<TemplateItem> ti = newTreeItem; ti.getParent() != null; ti = ti.getParent()) {
+                ti.getParent().setExpanded(true);
+            }
+            tree.getSelectionModel().select(tree.getRow(newTreeItem));
         });
     }
 
