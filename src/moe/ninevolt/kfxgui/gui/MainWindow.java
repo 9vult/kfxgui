@@ -1,5 +1,8 @@
 package moe.ninevolt.kfxgui.gui;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
@@ -10,8 +13,10 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
@@ -49,7 +54,10 @@ public class MainWindow extends Application {
     MenuItem exportsMI;
     MenuItem exportfMI;
     
-    Menu editMenu;
+    Menu projectMenu;
+    Menu targetMI;
+    ToggleGroup targetTG;
+    List<RadioMenuItem> targetMenuItems;
     
     VBox toolbox;
     Label toolboxLabel;
@@ -74,7 +82,10 @@ public class MainWindow extends Application {
         saveAsMI = new MenuItem("Save As...");
         exportsMI = new MenuItem("Export Text");
         exportfMI = new MenuItem("Export File...");
-        editMenu = new Menu("Edit");
+        projectMenu = new Menu("Project");
+        targetMI = new Menu("Set Target Templater...");
+        targetTG = new ToggleGroup();
+        targetMenuItems = new ArrayList<>();
         toolbox = new VBox();
         toolboxLabel = new Label("Toolbox");
         pluginList = new ListView<>();
@@ -88,7 +99,19 @@ public class MainWindow extends Application {
         window.setTitle("9volt GUI Karaoke Template Builder");
         
         fileMenu.getItems().addAll(atarashiiMI, openMI, saveMI, saveAsMI, new SeparatorMenuItem(), exportsMI, exportfMI);
-        menuBar.getMenus().addAll(fileMenu, editMenu);
+        projectMenu.getItems().addAll(targetMI);
+
+        for (String templater : LineType.getTargets()) {
+            RadioMenuItem target = new RadioMenuItem(templater);
+            target.setToggleGroup(targetTG);
+            targetMI.getItems().add(target);
+            if (templater.equals(KfxGui.getCurrentProject().getTargetTemplater())) target.setSelected(true);
+            target.setOnAction((e) -> {
+                KfxGui.getCurrentProject().setTargetTemplater(target.getText());
+            });
+        }
+
+        menuBar.getMenus().addAll(fileMenu, projectMenu);
         bp.setTop(menuBar);
 
         // MenuStrip
@@ -97,7 +120,6 @@ public class MainWindow extends Application {
                 TemplateItem templateItem = treeItem.getValue();
                 System.out.println(Plugin.normalizeOutput(templateItem.getFormattedResult(), false));
             }
-
         });
 
         // Toolbox
@@ -148,8 +170,9 @@ public class MainWindow extends Application {
                         }
                     }
                     // Select it (and expand parents)
-                    TreeItem<TemplateItem> loopItem = tree.getSelectionModel().getSelectedItem();
-                    while (loopItem != null) { loopItem.setExpanded(true); loopItem = loopItem.getParent(); }
+                    for (TreeItem<TemplateItem> ti = addingItem; ti.getParent() != null; ti = ti.getParent()) {
+                        ti.getParent().setExpanded(true);
+                    }
                     tree.getSelectionModel().select(tree.getRow(addingItem));
                 }
             }            
@@ -240,7 +263,7 @@ public class MainWindow extends Application {
                 HBox typeHBox = new HBox();
                 Label typeLabel = new Label("Line Type");
                 ComboBox<String> typeBox = new ComboBox<>();
-                for (String type : LineType.getTypes()) {
+                for (String type : LineType.getTypes(KfxGui.getCurrentProject().getTargetTemplater())) {
                     typeBox.getItems().add(type);
                 }
                 typeVBoxL.getChildren().addAll(typeLabel, typeBox);

@@ -7,10 +7,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.electronwill.nightconfig.core.file.FileConfig;
@@ -35,18 +33,23 @@ public class PluginLoader {
         plugins = new HashMap<>();
         try {
             List<Path> pluginPathList = Files.walk(Paths.get(pluginDirectory)).filter(Files::isRegularFile).collect(Collectors.toList());
-            Set<String> linetypes = new HashSet<>();
-
+            Map<String, List<String>> lineTypeMap = new HashMap<>();
+            
             for (Path pluginPath : pluginPathList) {
                 if (!pluginPath.toString().endsWith("toml")) continue;
                 
                 // Line types
                 if (pluginPath.toString().endsWith("linetype.toml")) {
+                    List<String> lineTypes = new ArrayList<>();
                     FileConfig fc = FileConfig.of(pluginPath);
                     fc.load();
                     for (String type : listconvert(fc.get("components"))) {
-                        linetypes.add(type);
+                        lineTypes.add(type);
                     }
+                    Collections.sort(lineTypes);
+                    Collections.reverse(lineTypes);
+                    lineTypeMap.put(fc.get("target"), lineTypes);
+
                 } else { // Plugin
                     FileConfig fc = FileConfig.of(pluginPath);
                     fc.load();
@@ -56,11 +59,7 @@ public class PluginLoader {
             }
             this.plugins.put(Transform.NAME, null);
 
-            List<String> lineTypeList = new ArrayList<>();
-            lineTypeList.addAll(linetypes);
-            Collections.sort(lineTypeList);
-            Collections.reverse(lineTypeList); // Reverse alphabetical so Template is above Code, etc
-            LineType.load(lineTypeList);
+            LineType.load(lineTypeMap);
             
         } catch (IOException ioe) {
             System.err.println(String.format("PluginLoader: %s", ioe.getMessage()));

@@ -1,6 +1,9 @@
 package moe.ninevolt.kfxgui.template;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Types of lines
@@ -10,14 +13,14 @@ import java.util.List;
  */
 public class LineType {
 
-    private String type;
-    private static List<String> types;
+    private String name;
+    private static Map<String, List<String>> types;
 
     private LineType(String type) {
-        this.type = type;
+        this.name = type;
     }
 
-    public static void load(List<String> types) {
+    public static void load(Map<String, List<String>> types) {
         LineType.types = types;
     }
 
@@ -25,17 +28,24 @@ public class LineType {
         return new LineType(type);
     }
 
-    public static List<String> getTypes() {
-        return LineType.types;
+    public static List<String> getTypes(String target) {
+        return LineType.types.get(target);
+    }
+
+    public static List<String> getTargets() {
+        List<String> result = new ArrayList<>();
+        result.addAll(LineType.types.keySet());
+        Collections.sort(result);
+        return result;
     }
 
     public String getName() {
-        return this.type;
+        return this.name;
     }
-    
+
     @Override
     public String toString() {
-        return this.type;
+        return this.name;
     }
 
 }

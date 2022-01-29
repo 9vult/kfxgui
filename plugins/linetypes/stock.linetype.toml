@@ -1,3 +1,4 @@
+target = "Stock"
 components = [
     "template line",
     "template pre-line",
