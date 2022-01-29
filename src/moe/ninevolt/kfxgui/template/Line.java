@@ -18,7 +18,7 @@ public class Line extends TemplateItem {
 
     private static final String NAME = "Name";
     private static final String STYLE = "Style";
-    private static final String ADDITIONAL = "Additional Type Declarations";
+    public  static final String ADDITIONAL = "Additional Template Declarations";
     private static final String LAYER = "Layer";
     private static final String ACTOR = "Actor";
 

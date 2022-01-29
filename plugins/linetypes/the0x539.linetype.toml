@@ -1,0 +1,15 @@
+components = [
+    "code once",
+    "code line",
+    "code syl",
+    "code word",
+    "code char",
+    "template line",
+    "template syl",
+    "template word",
+    "template char",
+    "mixin line",
+    "mixin syl",
+    "mixin word",
+    "mixin char",
+]

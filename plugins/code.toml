@@ -1,6 +1,6 @@
 name = "Custom"
 author = "9volt"
-description = "Manually write your own ASS code"
+description = "Manually write your own ASS or Lua code"
 transform = false
 params = [
     "Code"

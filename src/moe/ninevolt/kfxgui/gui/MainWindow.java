@@ -120,28 +120,37 @@ public class MainWindow extends Application {
             @Override
             public void handle(MouseEvent e) {
                 if (e.getClickCount() == 2) {
-                    TemplateItem selectedItem = pluginList.getSelectionModel().getSelectedItem();
-                    
-                    TreeItem<TemplateItem> cItem = tree.getSelectionModel().getSelectedItem();
-                    if (cItem == null) return;
-                    if ((cItem.getValue() instanceof Transform && selectedItem.transformProperty().get()) 
-                            || cItem.getValue() instanceof Line) {
+                    TemplateItem selectedItem = pluginList.getSelectionModel().getSelectedItem();                    
+                    TreeItem<TemplateItem> curItem = tree.getSelectionModel().getSelectedItem();
+                    TemplateTreeItem<String> addingItem;
+
+                    if (curItem == null) return;
+                    if ((curItem.getValue() instanceof Transform && selectedItem.transformProperty().get()) 
+                            || curItem.getValue() instanceof Line) {
                         // Add to the current line or transform
-                        TemplateItem newItem = KfxGui.getPluginLoader().create(cItem.getValue(), selectedItem.nameProperty().get());
-                        cItem.getChildren().add(new TemplateTreeItem<String>(newItem, newItem.nameProperty().get()));
-                        cItem.getValue().getChildren().add(newItem);
+                        TemplateItem newItem = KfxGui.getPluginLoader().create(curItem.getValue(), selectedItem.nameProperty().get());
+                        addingItem = new TemplateTreeItem<>(newItem, newItem.nameProperty().get());
+                        curItem.getChildren().add(addingItem);
+                        curItem.getValue().getChildren().add(newItem);
+
                     } else { // Cannot add to a "regular" plugin, go up a level
-                    TemplateItem newItem = KfxGui.getPluginLoader().create(cItem.getParent().getValue(), selectedItem.nameProperty().get());
-                        if (cItem.getParent().getValue() instanceof Transform && newItem instanceof Transform) {
+                    TemplateItem newItem = KfxGui.getPluginLoader().create(curItem.getParent().getValue(), selectedItem.nameProperty().get());
+                        if (curItem.getParent().getValue() instanceof Transform && newItem instanceof Transform) {
                             // Need to go up to grandparent level, can't add transform to transform!
-                            cItem.getParent().getParent().getChildren().add(new TemplateTreeItem<String>(newItem, newItem.nameProperty().get()));
-                            cItem.getParent().getParent().getValue().getChildren().add(newItem);
+                            addingItem = new TemplateTreeItem<>(newItem, newItem.nameProperty().get());
+                            curItem.getParent().getParent().getChildren().add(addingItem);
+                            curItem.getParent().getParent().getValue().getChildren().add(newItem);
                         } else {
                             // Add to the parent level
-                            cItem.getParent().getChildren().add(new TemplateTreeItem<String>(newItem, newItem.nameProperty().get()));
-                            cItem.getParent().getValue().getChildren().add(newItem);
+                            addingItem = new TemplateTreeItem<>(newItem, newItem.nameProperty().get());
+                            curItem.getParent().getChildren().add(addingItem);
+                            curItem.getParent().getValue().getChildren().add(newItem);
                         }
                     }
+                    // Select it (and expand parents)
+                    TreeItem<TemplateItem> loopItem = tree.getSelectionModel().getSelectedItem();
+                    while (loopItem != null) { loopItem.setExpanded(true); loopItem = loopItem.getParent(); }
+                    tree.getSelectionModel().select(tree.getRow(addingItem));
                 }
             }            
         });
@@ -154,7 +163,7 @@ public class MainWindow extends Application {
         tree.setShowRoot(false);
         TreeItem<TemplateItem> treeRoot = new TreeItem<>();
         tree.setRoot(treeRoot);
-        TemplateItem newLine = new Line(LineType.TEMPLATE_SYL, "New Line");
+        TemplateItem newLine = new Line(LineType.make("template syl"), "New Line");
         TreeItem<TemplateItem> defaultRootLineItem = TemplateTreeItem.baseItem(newLine);
         treeRoot.getChildren().add(defaultRootLineItem);
         
@@ -169,7 +178,7 @@ public class MainWindow extends Application {
             @Override
             public void handle(MouseEvent e) {
                 if (e.getClickCount() == 1) {
-                    TemplateItem newLine = new Line(LineType.TEMPLATE_SYL, "New Line");
+                    TemplateItem newLine = new Line(LineType.make("template syl"), "New Line");
                     TreeItem<TemplateItem> lineItem = TemplateTreeItem.baseItem(newLine);
                     treeRoot.getChildren().add(lineItem);
                 }
@@ -225,32 +234,47 @@ public class MainWindow extends Application {
             } else {
                 Line selectedLine = (Line)selectedItem;
                 titleLabel.setText(selectedLine.nameProperty().get());
-                // Line Type ComboBox
+                // Line Type ComboBox + Input field
+                VBox typeVBoxL = new VBox();
+                VBox typeVBoxR = new VBox();
                 HBox typeHBox = new HBox();
                 Label typeLabel = new Label("Line Type");
-                ComboBox<LineType> typeBox = new ComboBox<>();
-                for (LineType type : LineType.values()) {
+                ComboBox<String> typeBox = new ComboBox<>();
+                for (String type : LineType.getTypes()) {
                     typeBox.getItems().add(type);
                 }
+                typeVBoxL.getChildren().addAll(typeLabel, typeBox);
                 Region typePaddingV = new Region();
                 Region typePaddingHleft = new Region();
+                Region typePaddingHmiddle = new Region();
                 Region typePaddingHright = new Region();
                 typePaddingV.setMinHeight(10);
                 typePaddingHleft.setMinWidth(12);
+                typePaddingHmiddle.setMinWidth(12);
                 typePaddingHright.setMinWidth(12);
                 typeLabel.setMinWidth(100);
-                typeHBox.getChildren().addAll(typePaddingHleft, typeLabel, typeBox, typePaddingHright);
+                typeHBox.getChildren().addAll(typePaddingHleft, typeVBoxL, typePaddingHmiddle, typeVBoxR, typePaddingHright);
                 HBox.setHgrow(typeBox, Priority.ALWAYS);
+                HBox.setHgrow(typeVBoxR, Priority.ALWAYS);
                 paramGrandparentVBox.getChildren().addAll(typePaddingV, typeHBox);
-                typeBox.getSelectionModel().select(selectedLine.getType());
+                typeBox.getSelectionModel().select(selectedLine.getType().getName());
                 typeBox.setOnAction(e -> {
-                    selectedLine.setType(typeBox.getSelectionModel().getSelectedItem());
+                    selectedLine.setType(LineType.make(typeBox.getSelectionModel().getSelectedItem()));
                 });
 
                 // Everything Else for Lines
                 for (String parameter : selectedLine.getParams()) {
                     HBox paramParentHBox = new HBox();
                     Label paramTitle = new Label(parameter);
+                    paramTitle.setMinWidth(200);
+                    // Padding
+                    Region vPaddingSmol = new Region();
+                    Region hPaddingLeft = new Region();
+                    Region hPaddingRight = new Region();
+                    vPaddingSmol.setMinHeight(10);
+                    hPaddingLeft.setMinWidth(12);
+                    hPaddingRight.setMinWidth(12);
+
                     TextField paramInput = new TextField();
                     paramInput.setText(selectedLine.getParamMap().get(parameter));
                     paramInput.textProperty().addListener((observableText, oldValueText, newValueText) -> {
@@ -260,18 +284,13 @@ public class MainWindow extends Application {
                             selectedItem.nameProperty().set(newValueText);
                         }
                     });
-                    paramTitle.setMinWidth(200);
                     HBox.setHgrow(paramInput, Priority.ALWAYS);
-                    // Padding, temporary
-                    Region vPaddingSmol = new Region();
-                    Region hPaddingLeft = new Region();
-                    Region hPaddingRight = new Region();
-                    vPaddingSmol.setMinHeight(10);
-                    hPaddingLeft.setMinWidth(12);
-                    hPaddingRight.setMinWidth(12);
-                    //
-                    paramParentHBox.getChildren().addAll(hPaddingLeft, paramTitle, paramInput, hPaddingRight);
-                    paramGrandparentVBox.getChildren().addAll(vPaddingSmol, paramParentHBox);
+                    if (parameter.equals(Line.ADDITIONAL)) {
+                        typeVBoxR.getChildren().addAll(paramTitle, paramInput);
+                    } else {
+                        paramParentHBox.getChildren().addAll(hPaddingLeft, paramTitle, paramInput, hPaddingRight);
+                        paramGrandparentVBox.getChildren().addAll(vPaddingSmol, paramParentHBox);
+                    }
                 }
             }
         });

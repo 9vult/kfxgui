@@ -1,0 +1,12 @@
+components = [
+    "template line",
+    "template pre-line",
+    "template syl",
+    "template furi",
+    "template syl furi",
+    "code once",
+    "code line",
+    "code syl",
+    "code furi",
+    "code syl furi"
+]

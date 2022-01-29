@@ -7,12 +7,15 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.electronwill.nightconfig.core.file.FileConfig;
 
+import moe.ninevolt.kfxgui.template.LineType;
 import moe.ninevolt.kfxgui.template.TemplateItem;
 
 /**
@@ -32,19 +35,40 @@ public class PluginLoader {
         plugins = new HashMap<>();
         try {
             List<Path> pluginPathList = Files.walk(Paths.get(pluginDirectory)).filter(Files::isRegularFile).collect(Collectors.toList());
+            Set<String> linetypes = new HashSet<>();
 
             for (Path pluginPath : pluginPathList) {
                 if (!pluginPath.toString().endsWith("toml")) continue;
-                FileConfig fc = FileConfig.of(pluginPath);
-                fc.load();
-                this.plugins.put(fc.get("name"), pluginPath);
-                fc.close();
+                
+                // Line types
+                if (pluginPath.toString().endsWith("linetype.toml")) {
+                    FileConfig fc = FileConfig.of(pluginPath);
+                    fc.load();
+                    for (String type : listconvert(fc.get("components"))) {
+                        linetypes.add(type);
+                    }
+                } else { // Plugin
+                    FileConfig fc = FileConfig.of(pluginPath);
+                    fc.load();
+                    this.plugins.put(fc.get("name"), pluginPath);
+                    fc.close();
+                }
             }
             this.plugins.put(Transform.NAME, null);
+
+            List<String> lineTypeList = new ArrayList<>();
+            lineTypeList.addAll(linetypes);
+            Collections.sort(lineTypeList);
+            Collections.reverse(lineTypeList); // Reverse alphabetical so Template is above Code, etc
+            LineType.load(lineTypeList);
             
         } catch (IOException ioe) {
             System.err.println(String.format("PluginLoader: %s", ioe.getMessage()));
         }
+    }
+
+    private List<String> listconvert(List<String> input) {
+        return input;
     }
 
     /**
