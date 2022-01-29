@@ -6,7 +6,6 @@ import java.util.List;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -15,7 +14,6 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.SeparatorMenuItem;
-import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
@@ -28,6 +26,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import moe.ninevolt.kfxgui.KfxGui;
+import moe.ninevolt.kfxgui.gui.components.ParamArea;
 import moe.ninevolt.kfxgui.plugins.Plugin;
 import moe.ninevolt.kfxgui.plugins.Transform;
 import moe.ninevolt.kfxgui.template.Line;
@@ -69,6 +68,8 @@ public class MainWindow extends Application {
     Label addLineLabel;
     TreeView<TemplateItem> tree;
 
+    ParamArea currentDisplay;
+
     @Override
     public void start(Stage window) throws Exception {
         setUserAgentStylesheet(STYLESHEET_MODENA);
@@ -108,6 +109,8 @@ public class MainWindow extends Application {
             if (templater.equals(KfxGui.getCurrentProject().getTargetTemplater())) target.setSelected(true);
             target.setOnAction((e) -> {
                 KfxGui.getCurrentProject().setTargetTemplater(target.getText());
+                if (currentDisplay != null)
+                    currentDisplay.getComboBoxArea().updateTypeList();
             });
         }
 
@@ -210,115 +213,14 @@ public class MainWindow extends Application {
 
         // Parameter Input Area
 
-        VBox paramGrandparentVBox = new VBox();
         tree.getSelectionModel()
         .selectedItemProperty()
         .addListener((observable, oldValue, newValue) -> {
-            // Clear the box
-            paramGrandparentVBox.getChildren().clear();
-            Region vPaddingBeeg = new Region();
-            vPaddingBeeg.setMinHeight(20);
-            
-            // Heading
-            HBox heading = new HBox();
-            Region headLeft = new Region();
-            Region headRight = new Region();
-            Label titleLabel = new Label();
-            heading.getChildren().addAll(headLeft, titleLabel, headRight);
-            HBox.setHgrow(headLeft, Priority.ALWAYS);
-            HBox.setHgrow(headRight, Priority.ALWAYS);
-            titleLabel.setStyle("-fx-font-size: 22; -fx-font-weight: Bold;");
-            paramGrandparentVBox.getChildren().addAll(vPaddingBeeg, heading);
-
             TemplateItem selectedItem = newValue.getValue();
-            if (!(selectedItem instanceof Line)) {
-                titleLabel.setText(selectedItem.nameProperty().get());
-                for (String parameter : selectedItem.getParams()) {
-                    HBox paramParentHBox = new HBox();
-                    Label paramTitle = new Label(parameter);
-                    TextField paramInput = new TextField();
-                    paramInput.setText(selectedItem.getParamMap().get(parameter));
-                    paramInput.textProperty().addListener((observableText, oldValueText, newValueText) -> {
-                        selectedItem.setParam(parameter, newValueText);
-                    });
-                    paramTitle.setMinWidth(100);
-                    HBox.setHgrow(paramInput, Priority.ALWAYS);
-                    // Padding, temporary
-                    Region vPaddingSmol = new Region();
-                    Region hPaddingLeft = new Region();
-                    Region hPaddingRight = new Region();
-                    vPaddingSmol.setMinHeight(10);
-                    hPaddingLeft.setMinWidth(12);
-                    hPaddingRight.setMinWidth(12);
-                    //
-                    paramParentHBox.getChildren().addAll(hPaddingLeft, paramTitle, paramInput, hPaddingRight);
-                    paramGrandparentVBox.getChildren().addAll(vPaddingSmol, paramParentHBox);
-                }
-            } else {
-                Line selectedLine = (Line)selectedItem;
-                titleLabel.setText(selectedLine.nameProperty().get());
-                // Line Type ComboBox + Input field
-                VBox typeVBoxL = new VBox();
-                VBox typeVBoxR = new VBox();
-                HBox typeHBox = new HBox();
-                Label typeLabel = new Label("Line Type");
-                ComboBox<String> typeBox = new ComboBox<>();
-                for (String type : LineType.getTypes(KfxGui.getCurrentProject().getTargetTemplater())) {
-                    typeBox.getItems().add(type);
-                }
-                typeVBoxL.getChildren().addAll(typeLabel, typeBox);
-                Region typePaddingV = new Region();
-                Region typePaddingHleft = new Region();
-                Region typePaddingHmiddle = new Region();
-                Region typePaddingHright = new Region();
-                typePaddingV.setMinHeight(10);
-                typePaddingHleft.setMinWidth(12);
-                typePaddingHmiddle.setMinWidth(12);
-                typePaddingHright.setMinWidth(12);
-                typeLabel.setMinWidth(100);
-                typeHBox.getChildren().addAll(typePaddingHleft, typeVBoxL, typePaddingHmiddle, typeVBoxR, typePaddingHright);
-                HBox.setHgrow(typeBox, Priority.ALWAYS);
-                HBox.setHgrow(typeVBoxR, Priority.ALWAYS);
-                paramGrandparentVBox.getChildren().addAll(typePaddingV, typeHBox);
-                typeBox.getSelectionModel().select(selectedLine.getType().getName());
-                typeBox.setOnAction(e -> {
-                    selectedLine.setType(LineType.make(typeBox.getSelectionModel().getSelectedItem()));
-                });
-
-                // Everything Else for Lines
-                for (String parameter : selectedLine.getParams()) {
-                    HBox paramParentHBox = new HBox();
-                    Label paramTitle = new Label(parameter);
-                    paramTitle.setMinWidth(200);
-                    // Padding
-                    Region vPaddingSmol = new Region();
-                    Region hPaddingLeft = new Region();
-                    Region hPaddingRight = new Region();
-                    vPaddingSmol.setMinHeight(10);
-                    hPaddingLeft.setMinWidth(12);
-                    hPaddingRight.setMinWidth(12);
-
-                    TextField paramInput = new TextField();
-                    paramInput.setText(selectedLine.getParamMap().get(parameter));
-                    paramInput.textProperty().addListener((observableText, oldValueText, newValueText) -> {
-                        selectedLine.setParam(parameter, newValueText);
-                        if (parameter.equals("Name")) {
-                            titleLabel.setText(newValueText);
-                            selectedItem.nameProperty().set(newValueText);
-                        }
-                    });
-                    HBox.setHgrow(paramInput, Priority.ALWAYS);
-                    if (parameter.equals(Line.ADDITIONAL)) {
-                        typeVBoxR.getChildren().addAll(paramTitle, paramInput);
-                    } else {
-                        paramParentHBox.getChildren().addAll(hPaddingLeft, paramTitle, paramInput, hPaddingRight);
-                        paramGrandparentVBox.getChildren().addAll(vPaddingSmol, paramParentHBox);
-                    }
-                }
-            }
+            currentDisplay = new ParamArea(selectedItem);
+            bp.setCenter(currentDisplay);
         });
-
-        bp.setCenter(paramGrandparentVBox);
+        
 
         treeBox.getChildren().addAll(treeHBox, tree);
         VBox.setVgrow(tree, Priority.ALWAYS);
