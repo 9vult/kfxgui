@@ -1,0 +1,8 @@
+name = "Fade"
+author = "9volt"
+description = "Fade the object in/out"
+transform = false
+params = [
+    "FadeIn", "FadeOut"
+]
+format = "?fad($FadeIn}, ${FadeOut})"

@@ -2,6 +2,8 @@ package moe.ninevolt.kfxgui.template;
 
 import java.util.List;
 
+import javafx.beans.property.SimpleObjectProperty;
+
 /**
  * A Line is the basic container for actions/plugins.
  * Lines can be either TEMPLATE or CODE lines, and containerize
@@ -18,29 +20,32 @@ public class Line extends TemplateItem {
 
     private static final String NAME = "Name";
     private static final String STYLE = "Style";
-    public  static final String ADDITIONAL = "Additional Template Declarations";
     private static final String LAYER = "Layer";
     private static final String ACTOR = "Actor";
+    
+    public static final String ADDITIONAL = "Additional Template Declarations";
+    public static final String CODE = "Code";
 
-    private LineType type;
-    private static List<String> paramList = List.of(NAME, STYLE, ADDITIONAL, LAYER, ACTOR);
+    private SimpleObjectProperty<LineType> type;
+    private static List<String> paramList = List.of(NAME, STYLE, ADDITIONAL, LAYER, ACTOR, CODE);
 
     public Line(LineType type, String name) {
         super(null, Line.paramList, name, "", false);
-        this.type = type;
+        this.type = new SimpleObjectProperty<LineType>(type);
         setParam(NAME, name);
         setParam(STYLE, "Default");
         setParam(LAYER, "0");
         setParam(ADDITIONAL, "");
         setParam(ACTOR, "");
+        setParam(CODE, "");
     }
     
-    public LineType getType() {
+    public SimpleObjectProperty<LineType> getType() {
         return this.type;
     }
 
     public void setType(LineType type) {
-        this.type = type;
+        this.type.set(type);
     }
 
     @Override
@@ -65,23 +70,37 @@ public class Line extends TemplateItem {
         result.append(COMMA);
         result.append("0,0,0");
         result.append(COMMA);
-        result.append((type.toString() + " " + paramMap.get(ADDITIONAL)).trim());
+        result.append((type.get().getName() + " " + paramMap.get(ADDITIONAL)).trim());
         result.append(COMMA);
 
         result.append(LBRACE);
         result.append(this.nameProperty().get());
         result.append(RBRACE);
 
-        if (type.toString().contains("template")) result.append(LBRACE);
-        for (TemplateItem item : getChildren()) {
-            try {
-                result.append(item.getFormattedResult());
-            } catch (Exception e) {
-                System.out.println("Error on " + item.toString());
+        if (type.get().getName().toLowerCase().contains("template")){
+            result.append(LBRACE);
+            for (TemplateItem item : getChildren()) {
+                try {
+                    result.append(item.getFormattedResult());
+                } catch (Exception e) {
+                    System.out.println("Error on " + item.toString());
+                }
             }
+            result.append(RBRACE);
+        } else if (type.get().getName().toLowerCase().contains("code")) {
+            result.append(sanitize(paramMap.get(Line.CODE)));
         }
-        if (type.toString().contains("template")) result.append(RBRACE);
+    
         return result.toString();
+    }
+
+    /**
+     * Replace newlines with spaces for exportation
+     * @param input Text to sanitize
+     * @return Text without newlines
+     */
+    private static String sanitize(String input) {
+        return input.replaceAll("\n", " ");
     }
 
 }

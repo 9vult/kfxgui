@@ -22,6 +22,7 @@ public class ParamArea extends VBox {
     private TemplateItem hostItem;
     private boolean hostLine;
     private LineComboBoxArea cba;
+    private LineCodeArea lca;
 
     /**
      * Initialize the ParamArea
@@ -33,6 +34,7 @@ public class ParamArea extends VBox {
         this.vertPaddingTop = new Region();
         this.vertPaddingMiddle = new Region();
         this.cba = new LineComboBoxArea();
+        this.lca = new LineCodeArea();
 
         this.vertPaddingTop.setMinHeight(20);
         this.vertPaddingMiddle.setMinHeight(20);
@@ -128,13 +130,14 @@ public class ParamArea extends VBox {
         this.heading.setTitle(selectedLine.nameProperty().get());
         cba.updateTypeList();
         getChildren().add(cba);
-        cba.getTypeBox().getSelectionModel().select(selectedLine.getType().getName());
+        cba.getTypeBox().getSelectionModel().select(selectedLine.getType().get().getName());
         cba.getTypeBox().setOnAction(e -> {
             selectedLine.setType(LineType.make(cba.getTypeBox().getSelectionModel().getSelectedItem()));
         });
-        
+
         for (String pString : hostItem.getParams()) {
             if (pString.equals(Line.ADDITIONAL)) continue;
+            if (pString.equals(Line.CODE)) continue;
 
             Region r = new Region();
             r.setMinHeight(12);
@@ -151,6 +154,23 @@ public class ParamArea extends VBox {
             });
             this.getChildren().addAll(r, p);
         }
+
+        Region codePadding = new Region();
+        codePadding.setMinHeight(12);
+        getChildren().add(codePadding);
+
+        lca.getTextArea().setText(selectedLine.getParamMap().get(Line.CODE));
+        lca.getTextArea().textProperty().addListener((obs, oldVal, newVal) -> {
+            selectedLine.setParam(Line.CODE, newVal);
+        });
+
+        selectedLine.getType().addListener((obs, oldVal, newVal) -> {
+            if (newVal.getName().toLowerCase().contains("code")) {
+                if (!(getChildren().contains(lca))) getChildren().add(lca);
+            } else {
+                if (getChildren().contains(lca)) getChildren().remove(lca);
+            }
+        });
     }
 
 }
