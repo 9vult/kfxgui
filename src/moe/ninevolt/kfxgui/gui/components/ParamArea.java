@@ -96,23 +96,28 @@ public class ParamArea extends VBox {
         this.heading.setTitle(this.hostItem.nameProperty().get());
         ColorComboBoxArea ccba = new ColorComboBoxArea();
         Parameter cParam = new Parameter();
-        cParam.getTitle().setText(Color.COLOR);
-        cParam.getInputArea().setText(hostItem.getParamMap().get(Color.COLOR));
+        ColorPreviewArea cpa = new ColorPreviewArea();
         Region r = new Region();
         r.setMinHeight(12);
         Region r2 = new Region();
         r2.setMinHeight(12);
+        Region r3 = new Region();
+        r3.setMinHeight(12);
 
         cParam.getInputArea().textProperty().addListener((obs, oldText, newText) -> {
             this.hostItem.setParam(Color.COLOR, newText);
+            cpa.setColor(newText);
         });
         ccba.getTargetBox().setOnAction(e -> {
             this.hostItem.setParam(Color.TARGET, Color.targetMap.get(ccba.getTargetBox().getSelectionModel().getSelectedItem()));
             this.hostItem.setParam(Color.VERBOSE, ccba.getTargetBox().getSelectionModel().getSelectedItem());
         });
-        ccba.getTargetBox().getSelectionModel().select(this.hostItem.getParamMap().get(Color.VERBOSE));
 
-        this.getChildren().addAll(r, ccba, r2, cParam);
+        cParam.getTitle().setText(Color.COLOR);
+        cParam.getInputArea().setText(hostItem.getParamMap().get(Color.COLOR));
+
+        ccba.getTargetBox().getSelectionModel().select(this.hostItem.getParamMap().get(Color.VERBOSE));
+        this.getChildren().addAll(r, ccba, r2, cParam, r3, cpa);
     }
 
     /**

@@ -3,6 +3,8 @@ package moe.ninevolt.kfxgui.template;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.beans.property.SimpleStringProperty;
+
 /**
  * Color swatch
  * 
@@ -13,7 +15,7 @@ public class Swatch {
     
     private String name;
     private String value;
-    private String[] colorParts = { "FF", "FF", "FF" };
+    public SimpleStringProperty htmlColor;
 
     public static List<Swatch> swatches = new ArrayList<>();
 
@@ -22,7 +24,8 @@ public class Swatch {
      * @param name Name of the swatch
      * @param value ASS string value
      */
-    public Swatch(String name, String value) {
+    public Swatch(String name, String value, String hex) {
+        this.htmlColor = new SimpleStringProperty(hex);
         this.setName(name);
         this.setValue(value);
     }
@@ -55,21 +58,7 @@ public class Swatch {
      */
     public void setValue(String value) {
         this.value = value;
-        String trimmed = value.replaceAll("&", "").replaceAll("H", "");
-        String[] splits = trimmed.split("(?<=\\G...)");
-        
-        if (splits.length != 3) return;
-        this.colorParts[2] = splits[0];
-        this.colorParts[1] = splits[1];
-        this.colorParts[0] = splits[2];
-    }
-
-    /**
-     * Get the HTML #RRGGBB color string
-     * @return HTML #RRGGBB color string
-     */
-    public String getHTMLColor() {
-        return '#' + colorParts[0] + colorParts[1] + colorParts[2];
+        this.htmlColor.set(Swatch.convertColor(value));
     }
 
     /**
@@ -77,12 +66,25 @@ public class Swatch {
      * @return luminosity of the color
      */
     public double getLuminosity() {
-        String sub = getHTMLColor().substring(1);
+        String sub = htmlColor.get().substring(1);
         int rgb = Integer.parseInt(sub, 16);
         double r = (rgb >> 16) & 0xff;
         double g = (rgb >> 8) & 0xff;
         double b = (rgb >> 0) & 0xff;
         return 0.2126 * r + 0.7152 * g + 0.0722 * b; // per ITU-R BT.709
+    }
+
+    /**
+     * Convert an ASS color <code>&HBBGGRR&</code> to HTML <code>#RRGGBB</code>
+     * @param assColor ASS color code
+     * @return HTML color code
+     */
+    public static String convertColor(String assColor) {
+        String trimmed = assColor.replaceAll("&", "").replaceAll("H", "");
+        String[] splits = trimmed.split("(?<=\\G..)");
+        
+        if (splits.length != 3) return "";
+        return '#' + splits[2] + splits[1] + splits[0];
     }
 
 }
