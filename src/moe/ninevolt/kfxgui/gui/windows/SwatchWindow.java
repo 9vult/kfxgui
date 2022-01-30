@@ -26,6 +26,8 @@ public class SwatchWindow extends Stage {
     private TableColumn<Swatch, String> valueColumn;
 
     private Scene scene;
+    // setStyle("-fx-background-color: " + item.getHTMLColor());
+    // setStyle("-fx-text-fill: " + (item.getLuminosity() < 128 ? "#FFFFFF" : "#000000"));
 
     /**
      * Initialize the window
@@ -48,6 +50,7 @@ public class SwatchWindow extends Stage {
         this.valueColumn.setOnEditCommit((e) -> {
             Swatch s = e.getRowValue();
             s.setValue(e.getNewValue());
+            table.getSelectionModel().getSelectedCells().get(0);
         });
 
         table.getColumns().add(nameColumn);
@@ -55,8 +58,10 @@ public class SwatchWindow extends Stage {
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         table.setItems(FXCollections.observableList(Swatch.swatches));
         table.setEditable(true);
-        table.getItems().add(new Swatch("white", "&HFFFFFF&"));
-        table.getItems().add(new Swatch("black", "&H000000&"));
+        if (table.getItems().size() == 0) {
+            table.getItems().add(new Swatch("white", "&HFFFFFF&"));
+            table.getItems().add(new Swatch("black", "&H000000&"));
+        }
 
         table.setRowFactory(new Callback<TableView<Swatch>,TableRow<Swatch>>() {
             @Override

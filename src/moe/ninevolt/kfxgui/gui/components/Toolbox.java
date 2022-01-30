@@ -12,7 +12,6 @@ import moe.ninevolt.kfxgui.KfxGui;
 import moe.ninevolt.kfxgui.gui.TemplateTreeItem;
 import moe.ninevolt.kfxgui.plugins.Transform;
 import moe.ninevolt.kfxgui.template.Line;
-import moe.ninevolt.kfxgui.template.Swatch;
 import moe.ninevolt.kfxgui.template.TemplateItem;
 
 /**
