@@ -64,3 +64,11 @@ If the example plugin were in use, and the user supplied values of `120` for Sca
 ```
 \t($start, $mid, \fscx120\fscy120\frz15)\t($mid, $end, \fscx100\fscy100\frz0)
 ```
+
+## Dependencies
+
+- JDK 11.0.1
+- JavaFX 11.0.1
+- NightConfig-core 3.6.5
+- NightConfig-toml 3.6.5
+- Gson 2.8.9
