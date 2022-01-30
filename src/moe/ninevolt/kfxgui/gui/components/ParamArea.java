@@ -2,6 +2,7 @@ package moe.ninevolt.kfxgui.gui.components;
 
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import moe.ninevolt.kfxgui.plugins.Color;
 import moe.ninevolt.kfxgui.template.Line;
 import moe.ninevolt.kfxgui.template.LineType;
 import moe.ninevolt.kfxgui.template.TemplateItem;
@@ -20,7 +21,7 @@ public class ParamArea extends VBox {
     private Region vertPaddingMiddle;
     private TemplateItem hostItem;
     private boolean hostLine;
-    private ComboBoxArea cba;
+    private LineComboBoxArea cba;
 
     /**
      * Initialize the ParamArea
@@ -31,7 +32,7 @@ public class ParamArea extends VBox {
         this.heading = new Heading();
         this.vertPaddingTop = new Region();
         this.vertPaddingMiddle = new Region();
-        this.cba = new ComboBoxArea();
+        this.cba = new LineComboBoxArea();
 
         this.vertPaddingTop.setMinHeight(20);
         this.vertPaddingMiddle.setMinHeight(20);
@@ -42,7 +43,8 @@ public class ParamArea extends VBox {
             setUpLine();
             this.hostLine = true;
         } else {
-            setUpEvent();
+            if (hostItem instanceof Color) { setUpColorEvent(); }
+            else { setUpEvent(); }
             this.hostLine = false;
         } 
     }
@@ -64,7 +66,7 @@ public class ParamArea extends VBox {
     /**
      * @return Reference to the ComboBoxArea
      */
-    public ComboBoxArea getComboBoxArea() {
+    public LineComboBoxArea getComboBoxArea() {
         return this.cba;
     }
 
@@ -85,6 +87,32 @@ public class ParamArea extends VBox {
             });
             this.getChildren().addAll(r, p);
         }
+    }
+
+    /**
+     * Special setup procedure for the Color event
+     */
+    private void setUpColorEvent() {
+        this.heading.setTitle(this.hostItem.nameProperty().get());
+        ColorComboBoxArea ccba = new ColorComboBoxArea();
+        Parameter cParam = new Parameter();
+        cParam.getTitle().setText(Color.COLOR);
+        cParam.getInputArea().setText(hostItem.getParamMap().get(Color.COLOR));
+        Region r = new Region();
+        r.setMinHeight(12);
+        Region r2 = new Region();
+        r2.setMinHeight(12);
+
+        cParam.getInputArea().textProperty().addListener((obs, oldText, newText) -> {
+            this.hostItem.setParam(Color.COLOR, newText);
+        });
+        ccba.getTargetBox().setOnAction(e -> {
+            this.hostItem.setParam(Color.TARGET, Color.targetMap.get(ccba.getTargetBox().getSelectionModel().getSelectedItem()));
+            this.hostItem.setParam(Color.VERBOSE, ccba.getTargetBox().getSelectionModel().getSelectedItem());
+        });
+        ccba.getTargetBox().getSelectionModel().select(this.hostItem.getParamMap().get(Color.VERBOSE));
+
+        this.getChildren().addAll(r, ccba, r2, cParam);
     }
 
     /**

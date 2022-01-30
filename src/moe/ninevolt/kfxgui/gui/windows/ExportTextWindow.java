@@ -1,4 +1,4 @@
-package moe.ninevolt.kfxgui.gui;
+package moe.ninevolt.kfxgui.gui.windows;
 
 import javafx.scene.Scene;
 import javafx.scene.control.TextArea;

@@ -20,7 +20,7 @@ import moe.ninevolt.kfxgui.template.LineType;
  * @author 9volt
  * @since 2022/01/29
  */
-public class ComboBoxArea extends HBox {
+public class LineComboBoxArea extends HBox {
 
     private VBox left;
     private VBox right;
@@ -36,7 +36,7 @@ public class ComboBoxArea extends HBox {
     /**
      * Initialize the ComboBoxArea
      */
-    public ComboBoxArea() {
+    public LineComboBoxArea() {
         this.left = new VBox();
         this.right = new VBox();
         this.typeLabel = new Label("Line Type");

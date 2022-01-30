@@ -1,7 +1,7 @@
 package moe.ninevolt.kfxgui;
 
 import javafx.application.Application;
-import moe.ninevolt.kfxgui.gui.MainWindow;
+import moe.ninevolt.kfxgui.gui.windows.MainWindow;
 import moe.ninevolt.kfxgui.plugins.PluginLoader;
 import moe.ninevolt.kfxgui.template.Project;
 

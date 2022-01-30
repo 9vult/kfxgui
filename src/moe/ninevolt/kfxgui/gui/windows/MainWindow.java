@@ -1,9 +1,10 @@
-package moe.ninevolt.kfxgui.gui;
+package moe.ninevolt.kfxgui.gui.windows;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -48,6 +49,9 @@ public class MainWindow extends Application {
     ToggleGroup targetTG;
     List<RadioMenuItem> targetMenuItems;
 
+    Menu viewMenu;
+    MenuItem swatchMI;
+
     ParamArea currentDisplay;
     ProjectTree projectTree;
     Toolbox toolbox;
@@ -68,6 +72,8 @@ public class MainWindow extends Application {
         projectMenu = new Menu("Project");
         targetMI = new Menu("Set Target Templater...");
         targetTG = new ToggleGroup();
+        viewMenu = new Menu("View");
+        swatchMI = new MenuItem("Swatches");
         targetMenuItems = new ArrayList<>();
 
         projectTree = new ProjectTree();
@@ -90,7 +96,9 @@ public class MainWindow extends Application {
             });
         }
 
-        menuBar.getMenus().addAll(fileMenu, projectMenu);
+        viewMenu.getItems().add(swatchMI);
+
+        menuBar.getMenus().addAll(fileMenu, viewMenu, projectMenu);
         bp.setTop(menuBar);
 
         // MenuStrip
@@ -104,6 +112,11 @@ public class MainWindow extends Application {
             ExportTextWindow etw = new ExportTextWindow(sb.toString());
             etw.initModality(Modality.APPLICATION_MODAL);
             etw.show();
+        });
+
+        swatchMI.setOnAction(e -> {
+            SwatchWindow sw = new SwatchWindow();
+            sw.show();
         });
 
         // Toolbox
@@ -123,6 +136,10 @@ public class MainWindow extends Application {
         bp.setRight(projectTree);
 
         // Window Finalization
+
+        window.setOnCloseRequest(e -> {
+            Platform.exit();
+        });
         
         projectTree.getTree().getSelectionModel().select(0);
         window.setTitle("9volt GUI Karaoke Template Builder");
