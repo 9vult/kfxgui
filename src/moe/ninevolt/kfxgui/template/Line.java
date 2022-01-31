@@ -100,7 +100,7 @@ public class Line extends TemplateItem {
      * @return Text without newlines
      */
     private static String sanitize(String input) {
-        return input.replaceAll("\n", " ");
+        return input.replaceAll("\n", " ").replaceAll("§", " ");
     }
 
 }

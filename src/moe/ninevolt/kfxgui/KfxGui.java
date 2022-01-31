@@ -13,12 +13,16 @@ import moe.ninevolt.kfxgui.template.Project;
  */
 public class KfxGui {
 
+    public static String APPLICATION_NAME = "KFX-GUI";
+    public static String APPLICATION_DESC = "9volt GUI Karaoke Template Builder";
+    public static String APPLICATION_VERS = "0.1 Alpha";
+
     private static PluginLoader pl;
     private static Project project;
 
     private KfxGui(String[] args) {
         pl = new PluginLoader("./plugins");
-        project = new Project();
+        project = new Project("New Project", "Stock");
 
         Application.launch(MainWindow.class, args);
     }

@@ -1,5 +1,6 @@
 package moe.ninevolt.kfxgui.gui.windows;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,9 +15,11 @@ import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.TreeItem;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import moe.ninevolt.kfxgui.KfxGui;
+import moe.ninevolt.kfxgui.exporter.ProjectExporter;
 import moe.ninevolt.kfxgui.gui.components.ParamArea;
 import moe.ninevolt.kfxgui.gui.components.ProjectTree;
 import moe.ninevolt.kfxgui.gui.components.Toolbox;
@@ -39,7 +42,7 @@ public class MainWindow extends Application {
     Menu fileMenu;
     MenuItem atarashiiMI;
     MenuItem saveMI;
-    MenuItem saveAsMI;
+    // MenuItem saveAsMI;
     MenuItem openMI;
     MenuItem exportsMI;
     MenuItem exportfMI;
@@ -66,7 +69,7 @@ public class MainWindow extends Application {
         atarashiiMI = new MenuItem("New");
         openMI = new MenuItem("Open");
         saveMI = new MenuItem("Save");
-        saveAsMI = new MenuItem("Save As...");
+        // saveAsMI = new MenuItem("Save As...");
         exportsMI = new MenuItem("Export Text");
         exportfMI = new MenuItem("Export File...");
         projectMenu = new Menu("Project");
@@ -81,7 +84,7 @@ public class MainWindow extends Application {
 
         // Menu strip
         
-        fileMenu.getItems().addAll(atarashiiMI, openMI, saveMI, saveAsMI, new SeparatorMenuItem(), exportsMI, exportfMI);
+        fileMenu.getItems().addAll(atarashiiMI, openMI, saveMI, new SeparatorMenuItem(), exportsMI, exportfMI);
         projectMenu.getItems().addAll(targetMI);
 
         for (String templater : LineType.getTargets()) {
@@ -119,6 +122,22 @@ public class MainWindow extends Application {
             sw.show();
         });
 
+        saveMI.setOnAction(e -> {
+            FileChooser fc = new FileChooser();
+            fc.setTitle("Save");
+            fc.setInitialFileName(KfxGui.getCurrentProject().getName());
+            fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("KFX-GUI Project (*.kfxgui)", "*.kfxgui"));
+            File saveFile = fc.showSaveDialog(window);
+            if (saveFile != null) {
+                // Get lines
+                List<TemplateItem> lines = new ArrayList<>();
+                for (TreeItem<TemplateItem> treeItem : projectTree.getTree().getRoot().getChildren()) {
+                    lines.add(treeItem.getValue());
+                }
+                ProjectExporter.writeJson(lines, saveFile);
+            }
+        });
+
         // Toolbox
         
         bp.setLeft(toolbox);
@@ -142,7 +161,7 @@ public class MainWindow extends Application {
         });
         
         projectTree.getTree().getSelectionModel().select(0);
-        window.setTitle("9volt GUI Karaoke Template Builder");
+        window.setTitle(KfxGui.APPLICATION_DESC + " (" + KfxGui.APPLICATION_VERS + ")");
         Scene rootScene = new Scene(bp, 1100, 605);
         window.setScene(rootScene);
         window.show();

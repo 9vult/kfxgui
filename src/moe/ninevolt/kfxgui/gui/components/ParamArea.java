@@ -159,9 +159,9 @@ public class ParamArea extends VBox {
         codePadding.setMinHeight(12);
         getChildren().add(codePadding);
 
-        lca.getTextArea().setText(selectedLine.getParamMap().get(Line.CODE));
+        lca.getTextArea().setText(selectedLine.getParamMap().get(Line.CODE).replaceAll("§", "\n"));
         lca.getTextArea().textProperty().addListener((obs, oldVal, newVal) -> {
-            selectedLine.setParam(Line.CODE, newVal);
+            selectedLine.setParam(Line.CODE, newVal.replaceAll("\n", "§"));
         });
 
         selectedLine.getType().addListener((obs, oldVal, newVal) -> {
@@ -171,6 +171,12 @@ public class ParamArea extends VBox {
                 if (getChildren().contains(lca)) getChildren().remove(lca);
             }
         });
+
+        if (cba.getTypeBox().getSelectionModel().getSelectedItem().toLowerCase().contains("code")) {
+            if (!(getChildren().contains(lca))) getChildren().add(lca);
+        } else {
+            if (getChildren().contains(lca)) getChildren().remove(lca);
+        }
     }
 
 }

@@ -9,13 +9,19 @@ package moe.ninevolt.kfxgui.template;
 public class Project {
 
     private String targetTemplater;
+    private String name;
 
-    public Project() {
-        this.targetTemplater = "Stock";
+    public Project(String projectName, String targetTemplater) {
+        this.name = projectName;
+        this.targetTemplater = targetTemplater;
     }
 
     public String getTargetTemplater() {
         return targetTemplater;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public void setTargetTemplater(String templaterName) {
