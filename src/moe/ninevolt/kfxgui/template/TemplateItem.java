@@ -112,6 +112,15 @@ public abstract class TemplateItem {
         return this.paramMap;
     }
 
+    /**
+     * Replace the paramMap for this plugin.
+     * Only used when loading a project from file
+     * @param paramMap ParamMap to use
+     */
+    public void setParamMap(Map<String, String> paramMap) {
+        this.paramMap = paramMap;
+    }
+
     @Override
     public String toString() {
         return this.name.get();

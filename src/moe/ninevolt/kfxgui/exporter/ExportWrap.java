@@ -52,4 +52,8 @@ public class ExportWrap {
         return this.swatches;
     }
 
+    public List<ExportItem> getLines() {
+        return this.lines;
+    }
+
 }

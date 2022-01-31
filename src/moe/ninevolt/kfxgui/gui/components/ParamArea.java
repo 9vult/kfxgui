@@ -134,9 +134,14 @@ public class ParamArea extends VBox {
         cba.getTypeBox().setOnAction(e -> {
             selectedLine.setType(LineType.make(cba.getTypeBox().getSelectionModel().getSelectedItem()));
         });
+        cba.getAdditionalField().textProperty().set(selectedLine.getParamMap().get(Line.ADDITIONAL));
+        cba.getAdditionalField().textProperty().addListener((obs, oldVal, newVal) -> {
+            selectedLine.setParam(Line.ADDITIONAL, newVal);
+        });
 
         for (String pString : hostItem.getParams()) {
             if (pString.equals(Line.ADDITIONAL)) continue;
+            if (pString.equals(Line.EFFECT)) continue;
             if (pString.equals(Line.CODE)) continue;
 
             Region r = new Region();

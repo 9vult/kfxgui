@@ -24,10 +24,11 @@ public class Line extends TemplateItem {
     private static final String ACTOR = "Actor";
     
     public static final String ADDITIONAL = "Additional Template Declarations";
+    public static final String EFFECT = "Effect";
     public static final String CODE = "Code";
 
     private SimpleObjectProperty<LineType> type;
-    private static List<String> paramList = List.of(NAME, STYLE, ADDITIONAL, LAYER, ACTOR, CODE);
+    private static List<String> paramList = List.of(NAME, STYLE, ADDITIONAL, LAYER, ACTOR, EFFECT, CODE);
 
     public Line(LineType type, String name) {
         super(null, Line.paramList, name, "", false);
@@ -38,6 +39,7 @@ public class Line extends TemplateItem {
         setParam(ADDITIONAL, "");
         setParam(ACTOR, "");
         setParam(CODE, "");
+        setParam(EFFECT, "template syl");
     }
     
     public SimpleObjectProperty<LineType> getType() {
@@ -45,7 +47,10 @@ public class Line extends TemplateItem {
     }
 
     public void setType(LineType type) {
-        this.type.set(type);
+        try {
+            this.type.set(type);
+            setParam(EFFECT, type.getName());
+        } catch (NullPointerException e) {}
     }
 
     @Override
@@ -73,11 +78,10 @@ public class Line extends TemplateItem {
         result.append((type.get().getName() + " " + paramMap.get(ADDITIONAL)).trim());
         result.append(COMMA);
 
-        result.append(LBRACE);
-        result.append(this.nameProperty().get());
-        result.append(RBRACE);
-
         if (type.get().getName().toLowerCase().contains("template")){
+            result.append(LBRACE);
+            result.append(this.nameProperty().get());
+            result.append(RBRACE);
             result.append(LBRACE);
             for (TemplateItem item : getChildren()) {
                 try {

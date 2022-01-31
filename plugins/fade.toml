@@ -5,4 +5,4 @@ transform = false
 params = [
     "FadeIn", "FadeOut"
 ]
-format = "?fad($FadeIn}, ${FadeOut})"
+format = "?fad(${FadeIn}, ${FadeOut})"

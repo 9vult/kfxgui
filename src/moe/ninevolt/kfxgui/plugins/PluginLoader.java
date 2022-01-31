@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 import com.electronwill.nightconfig.core.file.FileConfig;
 
+import moe.ninevolt.kfxgui.exporter.ExportItem;
 import moe.ninevolt.kfxgui.template.LineType;
 import moe.ninevolt.kfxgui.template.TemplateItem;
 
@@ -121,6 +122,30 @@ public class PluginLoader {
                             fc.get("format"));
         fc.close();
         return p;
+    }
+
+    /**
+     * Create a new instance of an action by loading
+     * parameters from an ExportItem.
+     * <p>This function is recursive.</p>
+     * @param parent Parent item of the plugin
+     * @param export ExportItem to load from
+     * @return Populated copy of the plugin
+     */
+    public TemplateItem create(TemplateItem parent, ExportItem export) {
+        TemplateItem result = null;
+        if (export.getName().equals(Transform.NAME)) result = new Transform(parent);
+        else if (export.getName().equals(Color.NAME)) result = new Color(parent);
+        else result = create(parent, export.getName());
+
+        result.setParamMap(export.getParamMap());
+        result.nameProperty().set(export.getName());
+
+        for (ExportItem cExportItem : export.getChildren()) {
+            TemplateItem cTemplateItem = this.create(result, cExportItem);
+            result.getChildren().add(cTemplateItem);
+        }
+        return result;
     }
     
 }

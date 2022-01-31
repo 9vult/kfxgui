@@ -1,5 +1,7 @@
 package moe.ninevolt.kfxgui.gui.components;
 
+import java.util.List;
+
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
@@ -187,6 +189,27 @@ public class ProjectTree extends VBox {
      */
     public TreeView<TemplateItem> getTree() {
         return this.tree;
+    }
+
+    /**
+     * Load a project tree
+     * @param lines Lines to load in
+     */
+    public void loadProjectTree(List<TemplateItem> lines) {
+        getTree().getRoot().getChildren().clear();
+        for (TemplateItem line : lines) {
+            TreeItem<TemplateItem> lineTreeItem = TemplateTreeItem.baseItem(line);
+            getTree().getRoot().getChildren().add(lineTreeItem);
+            for (TemplateItem childItem : line.getChildren()) {
+                TreeItem<TemplateItem> childTreeItem = TemplateTreeItem.baseItem(childItem);
+                lineTreeItem.getChildren().add(childTreeItem);
+                
+                for (TemplateItem grandchildItem : childItem.getChildren()) {
+                    TreeItem<TemplateItem> grandchildTreeItem = TemplateTreeItem.baseItem(grandchildItem);
+                    childTreeItem.getChildren().add(grandchildTreeItem);
+                }
+            }
+        }
     }
 
 }

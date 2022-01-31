@@ -28,4 +28,8 @@ public class Project {
         this.targetTemplater = templaterName;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
 }

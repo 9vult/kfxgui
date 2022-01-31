@@ -19,12 +19,14 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import moe.ninevolt.kfxgui.KfxGui;
+import moe.ninevolt.kfxgui.exporter.ExportWrap;
 import moe.ninevolt.kfxgui.exporter.ProjectExporter;
 import moe.ninevolt.kfxgui.gui.components.ParamArea;
 import moe.ninevolt.kfxgui.gui.components.ProjectTree;
 import moe.ninevolt.kfxgui.gui.components.Toolbox;
 import moe.ninevolt.kfxgui.plugins.Plugin;
 import moe.ninevolt.kfxgui.template.LineType;
+import moe.ninevolt.kfxgui.template.Swatch;
 import moe.ninevolt.kfxgui.template.TemplateItem;
 
 /**
@@ -126,7 +128,7 @@ public class MainWindow extends Application {
             FileChooser fc = new FileChooser();
             fc.setTitle("Save");
             fc.setInitialFileName(KfxGui.getCurrentProject().getName());
-            fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("KFX-GUI Project (*.kfxgui)", "*.kfxgui"));
+            fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("KFX-GUI Project (*.kfxproj)", "*.kfxproj"));
             File saveFile = fc.showSaveDialog(window);
             if (saveFile != null) {
                 // Get lines
@@ -135,6 +137,23 @@ public class MainWindow extends Application {
                     lines.add(treeItem.getValue());
                 }
                 ProjectExporter.writeJson(lines, saveFile);
+            }
+        });
+
+        openMI.setOnAction(e -> {
+            FileChooser fc = new FileChooser();
+            fc.setTitle("Open");
+            fc.setInitialFileName("");
+            fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("KFX-GUI Project (*.kfxproj)", "*.kfxproj"));
+            File openFile = fc.showOpenDialog(window);
+            if (openFile != null) {
+                // Load everything up
+                ExportWrap wrapper = ProjectExporter.loadJson(openFile);
+                KfxGui.getCurrentProject().setName(wrapper.getProjectName());
+                KfxGui.getCurrentProject().setTargetTemplater(wrapper.getTargetTemplater()); // TODO: update the checkbox
+                Swatch.swatches = wrapper.getSwatches();
+                List<TemplateItem> lines = ProjectExporter.generateProjectTree(wrapper);
+                projectTree.loadProjectTree(lines);
             }
         });
 
@@ -147,9 +166,11 @@ public class MainWindow extends Application {
         projectTree.getTree().getSelectionModel()
         .selectedItemProperty()
         .addListener((observable, oldValue, newValue) -> {
-            TemplateItem selectedItem = newValue.getValue();
-            currentDisplay = new ParamArea(selectedItem);
-            bp.setCenter(currentDisplay);
+            try {
+                TemplateItem selectedItem = newValue.getValue();
+                currentDisplay = new ParamArea(selectedItem);
+                bp.setCenter(currentDisplay);
+            } catch (NullPointerException e) {}
         });
         
         bp.setRight(projectTree);
