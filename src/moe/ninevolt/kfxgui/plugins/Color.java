@@ -30,13 +30,13 @@ public class Color extends TemplateItem {
             true);
         setParam(TARGET, "1");
         setParam(COLOR, "&HFFFFFF&");
-        setParam(VERBOSE, "Primary");
+        setParam(VERBOSE, "1 Primary");
 
         targetMap = new HashMap<>();
-        targetMap.put("Primary",   "1");
-        targetMap.put("Secondary", "2");
-        targetMap.put("Outline",   "3");
-        targetMap.put("Shadow",    "4");
+        targetMap.put("1 Primary",   "1");
+        targetMap.put("2 Secondary", "2");
+        targetMap.put("3 Outline",   "3");
+        targetMap.put("4 Shadow",    "4");
     }
 
 

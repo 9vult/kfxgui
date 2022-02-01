@@ -7,17 +7,17 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
-import moe.ninevolt.kfxgui.plugins.Color;
+import moe.ninevolt.kfxgui.plugins.Alpha;
 
 /**
- * The Color Combo Box Area is
- * a special combobox for the color
- * effect, for listing color targets
+ * The Alpha Combo Box Area is
+ * a special combobox for the alpha
+ * effect, for listing alpha targets
  * 
  * @author 9volt
- * @since 2022/01/30
+ * @since 2022/01/31
  */
-public class ColorComboBoxArea extends HBox {
+public class AlphaComboBoxArea extends HBox {
 
     private Label heading;
     private ComboBox<String> targetBox;
@@ -28,13 +28,13 @@ public class ColorComboBoxArea extends HBox {
     /**
      * Initialize the ComboBoxArea
      */
-    public ColorComboBoxArea() {
-        this.heading = new Label(Color.TARGET);
+    public AlphaComboBoxArea() {
+        this.heading = new Label(Alpha.TARGET);
         this.targetBox = new ComboBox<>();
         this.heading.setMinWidth(100);
 
         ArrayList<String> targetList = new ArrayList<>();
-        targetList.addAll(Color.targetMap.keySet());
+        targetList.addAll(Alpha.targetMap.keySet());
         Collections.sort(targetList);
         targetBox.getItems().addAll(targetList);
 

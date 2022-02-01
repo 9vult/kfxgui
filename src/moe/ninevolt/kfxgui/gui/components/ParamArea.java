@@ -2,6 +2,7 @@ package moe.ninevolt.kfxgui.gui.components;
 
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import moe.ninevolt.kfxgui.plugins.Alpha;
 import moe.ninevolt.kfxgui.plugins.Color;
 import moe.ninevolt.kfxgui.template.Line;
 import moe.ninevolt.kfxgui.template.LineType;
@@ -46,6 +47,7 @@ public class ParamArea extends VBox {
             this.hostLine = true;
         } else {
             if (hostItem instanceof Color) { setUpColorEvent(); }
+            else if (hostItem instanceof Alpha) { setUpAlphaEvent(); }
             else { setUpEvent(); }
             this.hostLine = false;
         } 
@@ -122,6 +124,33 @@ public class ParamArea extends VBox {
         this.getChildren().addAll(r, ccba, r2, cParam, r3, cpa);
     }
 
+        /**
+     * Special setup procedure for the Alpha event
+     */
+    private void setUpAlphaEvent() {
+        this.heading.setTitle(this.hostItem.nameProperty().get());
+        AlphaComboBoxArea ccba = new AlphaComboBoxArea();
+        Parameter cParam = new Parameter();
+        Region r = new Region();
+        r.setMinHeight(12);
+        Region r2 = new Region();
+        r2.setMinHeight(12);
+
+        cParam.getInputArea().textProperty().addListener((obs, oldText, newText) -> {
+            this.hostItem.setParam(Alpha.ALPHA, newText);
+        });
+        ccba.getTargetBox().setOnAction(e -> {
+            this.hostItem.setParam(Alpha.TARGET, Alpha.targetMap.get(ccba.getTargetBox().getSelectionModel().getSelectedItem()));
+            this.hostItem.setParam(Alpha.VERBOSE, ccba.getTargetBox().getSelectionModel().getSelectedItem());
+        });
+
+        cParam.getTitle().setText(Alpha.ALPHA);
+        cParam.getInputArea().setText(hostItem.getParamMap().get(Alpha.ALPHA));
+
+        ccba.getTargetBox().getSelectionModel().select(this.hostItem.getParamMap().get(Alpha.VERBOSE));
+        this.getChildren().addAll(r, ccba, r2, cParam);
+    }
+
     /**
      * Setup procedure for Lines
      */
@@ -170,7 +199,7 @@ public class ParamArea extends VBox {
         });
 
         selectedLine.getType().addListener((obs, oldVal, newVal) -> {
-            if (newVal.getName().toLowerCase().contains("code")) {
+            if (newVal.getName() != null && newVal.getName().toLowerCase().contains("code")) {
                 if (!(getChildren().contains(lca))) getChildren().add(lca);
             } else {
                 if (getChildren().contains(lca)) getChildren().remove(lca);

@@ -60,6 +60,7 @@ public class PluginLoader {
             }
             this.plugins.put(Transform.NAME, null);
             this.plugins.put(Color.NAME, null);
+            this.plugins.put(Alpha.NAME, null);
 
             LineType.load(lineTypeMap);
             
@@ -109,6 +110,7 @@ public class PluginLoader {
     public TemplateItem create(TemplateItem parent, String name) {
         if (name.equals(Transform.NAME)) return new Transform(parent);
         if (name.equals(Color.NAME)) return new Color(parent);
+        if (name.equals(Alpha.NAME)) return new Alpha(parent);
 
         FileConfig fc = FileConfig.of(plugins.get(name));
         fc.load();

@@ -2,7 +2,9 @@ package moe.ninevolt.kfxgui.gui.windows;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -52,7 +54,7 @@ public class MainWindow extends Application {
     Menu projectMenu;
     Menu targetMI;
     ToggleGroup targetTG;
-    List<RadioMenuItem> targetMenuItems;
+    Map<String, RadioMenuItem> targetMenuItems;
 
     Menu viewMenu;
     MenuItem swatchMI;
@@ -69,17 +71,17 @@ public class MainWindow extends Application {
         menuBar = new MenuBar();
         fileMenu = new Menu("File");
         atarashiiMI = new MenuItem("New");
-        openMI = new MenuItem("Open");
-        saveMI = new MenuItem("Save");
+        openMI = new MenuItem("Open Project");
+        saveMI = new MenuItem("Save Project");
         // saveAsMI = new MenuItem("Save As...");
         exportsMI = new MenuItem("Export Text");
-        exportfMI = new MenuItem("Export File...");
+        exportfMI = new MenuItem("Export ASS File...");
         projectMenu = new Menu("Project");
         targetMI = new Menu("Set Target Templater...");
         targetTG = new ToggleGroup();
         viewMenu = new Menu("View");
         swatchMI = new MenuItem("Swatches");
-        targetMenuItems = new ArrayList<>();
+        targetMenuItems = new HashMap<>();
 
         projectTree = new ProjectTree();
         toolbox = new Toolbox(projectTree.getTree());
@@ -99,6 +101,7 @@ public class MainWindow extends Application {
                 if (currentDisplay != null)
                     currentDisplay.getComboBoxArea().updateTypeList();
             });
+            targetMenuItems.put(templater, target);
         }
 
         viewMenu.getItems().add(swatchMI);
@@ -150,10 +153,12 @@ public class MainWindow extends Application {
                 // Load everything up
                 ExportWrap wrapper = ProjectExporter.loadJson(openFile);
                 KfxGui.getCurrentProject().setName(wrapper.getProjectName());
-                KfxGui.getCurrentProject().setTargetTemplater(wrapper.getTargetTemplater()); // TODO: update the checkbox
+                KfxGui.getCurrentProject().setTargetTemplater(wrapper.getTargetTemplater());
+                targetMenuItems.get(wrapper.getTargetTemplater()).selectedProperty().set(true);
                 Swatch.swatches = wrapper.getSwatches();
                 List<TemplateItem> lines = ProjectExporter.generateProjectTree(wrapper);
                 projectTree.loadProjectTree(lines);
+                projectTree.getTree().getSelectionModel().select(0);
             }
         });
 
