@@ -9,3 +9,4 @@ libs/*
 .settings
 .settings/*
 ./.settings/*
+/target/
