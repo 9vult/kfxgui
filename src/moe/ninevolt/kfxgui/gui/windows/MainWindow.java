@@ -46,7 +46,6 @@ public class MainWindow extends Application {
     Menu fileMenu;
     MenuItem atarashiiMI;
     MenuItem saveMI;
-    // MenuItem saveAsMI;
     MenuItem openMI;
     MenuItem exportsMI;
     MenuItem exportfMI;
@@ -73,7 +72,6 @@ public class MainWindow extends Application {
         atarashiiMI = new MenuItem("New");
         openMI = new MenuItem("Open Project");
         saveMI = new MenuItem("Save Project");
-        // saveAsMI = new MenuItem("Save As...");
         exportsMI = new MenuItem("Export Text");
         exportfMI = new MenuItem("Export ASS File...");
         projectMenu = new Menu("Project");
@@ -82,6 +80,9 @@ public class MainWindow extends Application {
         viewMenu = new Menu("View");
         swatchMI = new MenuItem("Swatches");
         targetMenuItems = new HashMap<>();
+        
+        atarashiiMI.setDisable(true);
+        exportfMI.setDisable(true);
 
         projectTree = new ProjectTree();
         toolbox = new Toolbox(projectTree.getTree());

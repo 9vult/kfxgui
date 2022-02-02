@@ -10,3 +10,4 @@ libs/*
 .settings/*
 ./.settings/*
 /target/
+dependency-reduced-pom.xml

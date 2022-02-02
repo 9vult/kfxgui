@@ -1,0 +1,8 @@
+name = "Text"
+author = "9volt"
+description = "Add text directly to the line"
+transform = false
+params = [
+    "Text"
+]
+format = "}${Text}{"
