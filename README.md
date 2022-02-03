@@ -1,16 +1,37 @@
+<!-- omit in toc -->
 # KFX-GUI
+<!-- omit in toc -->
+#### 9volt GUI Karaoke Template Builder
 
-KFX-GUI is a highly extensible graphical karaoke template builder for Advanced Substation Alpha (ASS) subtitles. KFX-GUI does not execute karaoke templates, it only provides a graphical building tool with automation via plugins.
+KFX-GUI is a highly extensible graphical karaoke template builder for Advanced Substation Alpha (ASS) subtitles. KFX-GUI does not execute karaoke templates, it only provides a graphical building tool for creating them with automation via plugins.
 
-KFX-GUI is currently in very early development and has limited use. Pull/feature requests, especially for creating the stock plugin suite, are welcome.
+<!-- omit in toc -->
+## Contents
 
-## Plugins
+- [Plugins](#plugins)
+  - [Effect Component Plugins](#effect-component-plugins)
+    - [Creating a Component plugin](#creating-a-component-plugin)
+    - [Component Plugin Format](#component-plugin-format)
+  - [Templater Line Definition Plugins](#templater-line-definition-plugins)
+    - [Creating a Line Definition Plugin](#creating-a-line-definition-plugin)
+    - [Line Definition Plugin Format](#line-definition-plugin-format)
+      - [Code line definitions](#code-line-definitions)
+- [Dependencies](#dependencies)
 
-KFX-GUI uses plugins to represent each possible action in the template. The most basic plugins represent a single ASS tag, such as `\pos` for setting the position or `\border` to add an outline. However, the major benefit to using a plugin system, rather than hardcoding all the tags and their functions, is extensibility. Plugins can easily be created to automate the creation of repetitive actions and effects.
+# Plugins
 
-### Creating a plugin
+KFX-GUI uses plugins in a couple different ways. Currently, there are two different plugin types - effect components and templater line definitions.
+Plugins are used to provide extensibility and both backward and forward compatibility with existing and future templaters and ASS versions.
 
-KFX-GUI plugins are written in the TOML format, and are automatically loaded from the plugins folder on startup. An example plugin that creates a grow-and-rotate effect during the syl's duration might look like this:
+## Effect Component Plugins
+
+The most basic component plugins represent a single ASS tag, such as `\pos` for setting the position or `\border` to add an outline. However, the beauty of a plugin system is being able to define pretty much whatever you want, so long as it fits within a few constraints.
+
+Plugins are written in the TOML format, and are automatically loaded from the plugins folder on startup. They should follow a filename convention of `pluginname.toml`.
+
+### Creating a Component plugin
+
+The following example defines a plugin that creates a basic grow-and-rotate syl effect:
 
 ```toml
 name = "Grow-And-Rotate"
@@ -23,52 +44,74 @@ params = [
 format = "?t($start, $mid, ?fscx${Scale}?fscy${Scale}?frz${Rotation})?t($mid, $end, ?fscx100?fscy100?frz0)"
 ```
 
-### Explanation of the format
+### Component Plugin Format
 
-```toml
-name = "Grow-And-Rotate"
-author = "9volt"
-description = "Expand syl size and rotate it, then return to normal over the syl's duration"
-```
+The component plugin format consists of 3 sections.
 
-Pretty self-explanitory. The name of the plugin will be used in the toolbox, and the description will appear as a tooltip when the toolbox entry is hovered over.
+1. Plugin identification
+   - The first 4 lines of the file describe the `name`, `author`, and short `description` of the plugin. The description is used as a tooltip in the toolbox panel.
+   - The 5th line, `transform`, defines if the plugin may be used within Transform events. For most custom plugins, this is likely to be false, as a transform tag will be provided by the plugin itself.
 
-```toml
-transform = false
-```
+2. Parameters
+    - Here we define a list of parameters the user will supply. Each item in the list will be linked to a text field labeled with the parameter name.
+    - In the example, the user will be asked to supply the `Scale` and `Rotation` values.
 
-This property denotes if this plugin may be used within a transform event. For most plugins, this will be `false`, as the plugin will supply its own transform tags or contain other tags, like `\move`, which cannot be used within a transform event.
+3. Format String
+   - The format string defines the output of the plugin.
+   - The backslash `\` should be replaced with a question mark `?` in the format string to avoid any potential issues with escape characters. Question marks in the format string will automatically be replaced with backslashes with the finalized ASS code is generated.
+   - Variables follow a format similar to f-strings in Python, `${VariableName}`, and are case-sensitive.
 
-```toml
-params = [
-    "Scale", "Rotation"
-]
-```
+<!-- omit in toc -->
+#### Result
 
-Here we list all the variables that will be supplied by the user. In this example, the user will supply the scale percentage and angle of rotation. This could easily be expanded to include additional variables, like a variable mid-point to the effect or separate X and Y scale values.
-
-```toml
-format = "?t($start, $mid, ?fscx${Scale}?fscy${Scale}?frz${Rotation})?t($mid, $end, ?fscx100?fscy100?frz0)"
-```
-
-The final part to the plugin is the format definition. Here, the format for the ASS tags to be generated by the plugin are laid out, along with any variables needed. 
-
-The backslash `\` should be replaced with a `?` in the format string to avoid issues with escape characters. The question marks will automatically be replaced with backslashes when the final ASS code is generated.
-
-Variables are case-sensitive, and follow a format similar to f-strings in Python, which is `${VariableName}`.
-
-### Plugin Result
-
-If the example plugin were in use, and the user supplied values of `120` for Scale and `15` for Rotation, KFX-GUI would generate the following ASS code, which would be included along with the results from all other actions present on that line:
+Assuming a user suppliad values of `120` for Scale and `15` for Rotation, the following ASS code would be generated when this plugin is executed:
 
 ```
 \t($start, $mid, \fscx120\fscy120\frz15)\t($mid, $end, \fscx100\fscy100\frz0)
 ```
 
-## Dependencies
+## Templater Line Definition Plugins
 
-- JDK 11.0.1
-- JavaFX 11.0.1
-- NightConfig-core 3.6.5
-- NightConfig-toml 3.6.5
-- Gson 2.8.9
+The second type of plugin used by KFX-GUI defines the line types used by a templater. This allows KFX-GUI to support an unlimited number of templaters, both present and future, since one can easily write a plugin to support their favorite templater.
+
+Line definition plugins must use the `*.linetype.toml` file extension.
+
+### Creating a Line Definition Plugin
+
+Below is an excerpt from the stock plugin providing support for The0x539's karaoke templater:
+
+```toml
+target = "The0x539"
+components = [
+    "code once",
+    "code line",
+    "template line",
+    "template syl",
+    "mixin word",
+    "mixin char"
+]
+```
+
+### Line Definition Plugin Format
+
+There are two parts to line definition plugins:
+
+1. `target` - The target is the name of the templater this plugin supports.
+2. `components` - A list of strings defining the line types used by the templater.
+
+#### Code line definitions
+
+Code lines are a special part of any karaoke template, and KFX-GUI has some special features for code lines. This section applies to any line with a line type containing the word `code`.
+
+- A code entry box is displayed on the line settings page
+- Components will not be parsed on a code line during ASS generation
+  - Similarly, code will not be parsed on non-code lines
+
+
+# Dependencies
+
+KFX-GUI is a Maven project, and specifics on dependency and plugin usage can be found in the `pom.xml` file in the root directory of this project. TL;DR is that KFX-GUI depends on:
+- Java 11
+- JavaFX 11
+- Night-Config Core, TOML
+- Gson
